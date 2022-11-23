@@ -1,4 +1,4 @@
-rappels sur les containers / templates :
+o rappels sur les containers / templates :
 
 --> file:///mnt/nfs/homes/slahlou/Downloads/Effective_C_3rd_ed.pdf
 livre "Effective C++ 3th" a lire a partir de la page 199 pour les templates.
@@ -14,3 +14,14 @@ exemple d'implementation d'iterator.
 
 --> https://pastebin.com/51GvtVeA
 exemple simplifie d'implementation d'un iterator
+
+--> https://docs.oracle.com/cd/E19422-01/819-3704/ite_2405.htm
+doc ORACLE qui detaille l'implementation de la "class" iterators_traits
+
+
+
+o DIVERS
+
+--> https://stackoverflow.com/questions/8054273/how-to-implement-an-stl-style-iterator-and-avoid-common-pitfalls
+stack_overflow qui t'avait donne l'idee d'implementer ta class iterators_traits sous la forme de specialisations
+uniquement, etant donne que tu n'aura que peu de type differents d'iterator.
