@@ -1,0 +1,10 @@
+rappels sur les containers / templates :
+
+--> file:///mnt/nfs/homes/slahlou/Downloads/Effective_C_3rd_ed.pdf
+livre "Effective C++ 3th" a lire a partir de la page 199 pour les templates.
+
+--> https://www.lirmm.fr/~ducour/Doc-objets/ISO+IEC+14882-1998.pdf
+pdf des standard ISO c++, sympa pour chercher un mot cles en particulier.
+
+-->https://medium.com/@vgasparyan1995/what-is-an-allocator-c8df15a93ed 
+comprendre les allocators
