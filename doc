@@ -25,3 +25,8 @@ o DIVERS
 --> https://stackoverflow.com/questions/8054273/how-to-implement-an-stl-style-iterator-and-avoid-common-pitfalls
 stack_overflow qui t'avait donne l'idee d'implementer ta class iterators_traits sous la forme de specialisations
 uniquement, etant donne que tu n'aura que peu de type differents d'iterator.
+
+o VECTOR RELATED STUFF:
+
+--> https://en.cppreference.com/w/cpp/header/vector
+cpp Reference implementation du container Vector
