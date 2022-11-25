@@ -4,9 +4,47 @@
 #include <iostream>
 #include <string>
 #include <memory>
-/*
+
 namespace ft {
-*/
+
+
+	/*---------------  Iterators_traits  -----------------*/
+
+template <class Iterator>
+struct iterator_traits {
+
+	typedef	typename	Iterator::value_type		value_type;
+	typedef	typename	Iterator::difference_type	difference_type;
+	typedef	typename	Iterator::pointer			pointer;
+	typedef	typename	Iterator::reference 		reference;
+	typedef	typename	Iterator::iterator_category	iterator_category;
+
+};
+
+template <class T>
+struct iterator_traits<T*> {
+
+	typedef	T								value_type;
+	typedef	T*								pointer;
+	typedef	T&								reference;
+	typedef	std::ptrdiff_t					difference;
+	typedef	std::random_access_iterator_tag	iterator_category;
+
+};
+
+
+template <class T>
+struct iterator_traits<const T*> {
+
+	typedef	const T									value_type;
+	typedef	const T*								pointer;
+	typedef	const T&								reference;
+	typedef	const std::ptrdiff_t					difference;
+	typedef	const std::random_access_iterator_tag	iterator_category;
+
+};
+
+
 template <typename T>
 class	standard_tab_iterator : public std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&> {
 	public :
@@ -106,9 +144,15 @@ class vector {
 				while (--n)
 					mhandle.construct(first_element + n, val);
 				mhandle.construct(first_element + n, val);
-				mhandle.construct(first_element + 1, 24);
+			}
+
+			~vector(){
+				for (size_type tmp = this->size; tmp < this->size; tmp++)
+					mhandle.destroy(first_element + tmp);
+				mhandle.deallocate(first_element, capacity);
 
 			}
+
 			/*
 			template <class InputIterator> vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) {
 				this->mhandle = alloc;
@@ -125,12 +169,12 @@ class vector {
 				}
 			}
 			*/
+
 			/*  -----------  Methodes definition  -----------  */
-//			void			insert(iterator position, size_type n, const value_type & val);
+			void			insert(iterator position, size_type n, const value_type & val);
 //			iterator		erase(iterator position);
 
 			iterator		begin( void ) {
-				std::cout << "first element : " << first_element[0] << "\n";
 				return iterator(first_element);
 			}
 
@@ -143,9 +187,8 @@ class vector {
 			pointer 		first_element;
 			allocator_type	mhandle;
 };
-/*
 }
-*/
+
 
 #endif
 
