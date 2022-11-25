@@ -1,12 +1,15 @@
-o rappels sur les containers / templates :
+o RAPPELS ET GENERALITE SUR LES CONTAIMERS / TEMPLATES :
 
---> file:///mnt/nfs/homes/slahlou/Downloads/Effective_C_3rd_ed.pdf
+--> https://cpp.developpez.com/cours/cpp/?page=page_14#LXIV-E-1
+cours de developpez.com sur les templates
+
+--> ../
 livre "Effective C++ 3th" a lire a partir de la page 199 pour les templates.
 
 --> https://www.lirmm.fr/~ducour/Doc-objets/ISO+IEC+14882-1998.pdf
 pdf des standard ISO c++, sympa pour chercher un mot cles en particulier.
 
---> https://medium.com/@vgasparyan1995/what-is-an-allocator-c8df15a93ed 
+--> https://medium.com/@vgasparyan1995/what-is-an-allocator-c8df15a93ed
 comprendre les allocators
 
 --> https://web.archive.org/web/20130822120217/http://www.drdobbs.com:80/the-standard-librarian-defining-iterato/184401331?pgno=3
