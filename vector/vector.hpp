@@ -4,8 +4,95 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#define BN "\n"
 
 namespace ft {
+
+	/*---------------  remove_cv  -----------------*/
+	template< class T > struct remove_cv                   { typedef T type; };
+	template< class T > struct remove_cv<const T>          { typedef T type; };
+	template< class T > struct remove_cv<volatile T>       { typedef T type; };
+	template< class T > struct remove_cv<const volatile T> { typedef T type; };
+
+	template< class T > struct remove_const                { typedef T type; };
+	template< class T > struct remove_const<const T>       { typedef T type; };
+
+	template< class T > struct remove_volatile             { typedef T type; };
+	template< class T > struct remove_volatile<volatile T> { typedef T type; };
+
+
+	/*---------------  Enable_if  -----------------*/
+	template<bool condition, typename T>
+	struct enable_if { /* no type defined SFINAE will do the job*/ };
+
+	template <typename T>
+	struct enable_if<true, T> { typedef T type; /*  "returning a type meaning there is a match "*/ };
+
+	/*---------------  Is_Integral  -----------------*/
+
+	template<typename T>
+	struct is_integral {
+		static const bool value = false;
+	};
+	template<>
+	struct is_integral<bool> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<char> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<wchar_t> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<signed char> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<short int> {
+		static const bool value = true;
+	};
+		template<>
+	struct is_integral<int> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<long int> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<long long int> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<unsigned char> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<unsigned short int> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<unsigned int> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<unsigned long int> {
+		static const bool value = true;
+	};
+	template<>
+	struct is_integral<unsigned long long int> {
+		static const bool value = true;
+	};
+
+
+
+
+
+
+
 
 
 	/*---------------  Iterators_traits  -----------------*/
@@ -146,29 +233,31 @@ class vector {
 				mhandle.construct(first_element + n, val);
 			}
 
-			~vector(){
-				for (size_type tmp = this->size; tmp < this->size; tmp++)
-					mhandle.destroy(first_element + tmp);
-				mhandle.deallocate(first_element, capacity);
-
-			}
-
-			/*
-			template <class InputIterator> vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) {
+			template <class InputIterator>
+			vector(InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, InputIterator>::type = NULL, const allocator_type& alloc = allocator_type())
+			: size(0), capacity(0), first_element(NULL), mhandle(alloc) {
 				this->mhandle = alloc;
 				InputIterator temp = first;
 				size_t	i = 0;
-				while (temp++ != first)
-					i++;
-				first_element = mhandle.allocate(i);
-				i = 0;
+				while (temp++ != last)
+					this->size++;
+				this->capacity = this->size;
+				first_element = mhandle.allocate(size);
 				while (first != last) {
 					mhandle.construct(first_element + i, *first);
 					first++;
 					i++;
 				}
 			}
-			*/
+
+			~vector(){
+				for (size_type tmp = this->size; tmp < this->size; tmp++)
+					mhandle.destroy(first_element + tmp);
+				mhandle.deallocate(first_element, this->capacity);
+
+			}
+
+
 
 			/*  -----------  Methodes definition  -----------  */
 			void			insert(iterator position, size_type n, const value_type & val);

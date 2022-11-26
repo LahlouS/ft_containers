@@ -33,3 +33,11 @@ o VECTOR RELATED STUFF:
 
 --> https://en.cppreference.com/w/cpp/header/vector
 cpp Reference implementation du container Vector
+
+o SFINAE & TMP (Template meta programming)
+--> https://jonathanpoelen.github.io/2020/04/sfinae/#emplacement-des-expressions-pour-le-sfinae
+une petite doc en francais expliquant le cncepte de de SFINAE avec des exemple de plus en plus tricky
+
+--> https://www.youtube.com/watch?v=tiAVWcjIF6o  & https://www.youtube.com/watch?v=dLZcocFOb5Q
+video de jhon Hagins (le gros qui a une drole de maniere de parler) part 1 / 2 & part 2 / 2
+
