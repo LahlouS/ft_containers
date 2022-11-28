@@ -31,61 +31,68 @@ namespace ft {
 	/*---------------  Is_Integral  -----------------*/
 
 	template<typename T>
-	struct is_integral {
+	struct is_int {
 		static const bool value = false;
 	};
+
 	template<>
-	struct is_integral<bool> {
+	struct is_int<bool> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<char> {
+	struct is_int<char> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<wchar_t> {
+	struct is_int<wchar_t> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<signed char> {
+	struct is_int<signed char> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<short int> {
+	struct is_int<short int> {
 		static const bool value = true;
 	};
 		template<>
-	struct is_integral<int> {
+	struct is_int<int> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<long int> {
+	struct is_int<long int> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<long long int> {
+	struct is_int<long long int> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<unsigned char> {
+	struct is_int<unsigned char> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<unsigned short int> {
+	struct is_int<unsigned short int> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<unsigned int> {
+	struct is_int<unsigned int> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<unsigned long int> {
+	struct is_int<unsigned long int> {
 		static const bool value = true;
 	};
 	template<>
-	struct is_integral<unsigned long long int> {
+	struct is_int<unsigned long long int> {
 		static const bool value = true;
 	};
+
+	template<typename T>
+	struct is_integral {
+		static const bool value = is_int<typename remove_cv<T>::type >::value;
+	};
+
 
 
 
@@ -137,71 +144,98 @@ class	standard_tab_iterator : public std::iterator<std::random_access_iterator_t
 	public :
 
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::pointer pointer;
+		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::difference_type difference_type;
+		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::value_type value_type;
+
 		/* ---------- Constructors ---------- */
 
-		standard_tab_iterator() : location(NULL) {  /*  nothing to put for the moment  */  }
+		standard_tab_iterator() : _location(NULL) {  /*  nothing to put for the moment  */  }
 		standard_tab_iterator(T* start_addr) {
-			location = start_addr;
+			_location = start_addr;
 		}
 		standard_tab_iterator(standard_tab_iterator<T> const & itToCopy) {
 			*this = itToCopy;
 		}
 
 		standard_tab_iterator<T> const & operator=(standard_tab_iterator<T> const & itToAssign) {
-			this->location = itToAssign.location;
+			this->_location = itToAssign._location;
 			return (*this);
 		}
 
 		~standard_tab_iterator(){ /*  nothing to put for the moment  */ }
 
 		/* ---------- Operators overloads ---------- */
-
+		/*  -----------  ++ ++ && -- -- -----------  */
 
 		standard_tab_iterator<T> const & operator++( void ){
-			location++;
-			return (location);
+			_location++;
+			return (*this);
 		}
 
 		standard_tab_iterator<T>	operator++( int ) {
 			standard_tab_iterator<T>	temp = *this;
-			location++;
+			_location++;
 			return (temp);
 		}
 
 		standard_tab_iterator<T> const & operator--( void ){
-			location--;
-			return (location);
+			_location--;
+			return (*this);
 		}
 
 		standard_tab_iterator<T>	operator--( int ) {
 			standard_tab_iterator<T>	temp = *this;
-			location--;
+			_location--;
 			return (temp);
 		}
+		/*  -----------  == && != -----------  */
 
 		bool		operator==(standard_tab_iterator<T> const & itToComp) {
-			if (location == itToComp.location)
+			if (_location == itToComp._location)
 				return (true);
 			return (false);
 		}
 
 		bool		operator!=(standard_tab_iterator<T> const & itToComp) {
-			if (location != itToComp.location)
+			if (_location != itToComp._location)
 				return (true);
 			return (false);
 		}
 
-		T const &	operator*( void ) {
-			return (*location);
+		/*  -----------  * && -> -----------  */
+
+		T const &	operator*( void ) const {
+			return (*_location);
 		}
 
-		T const &	operator->( void ) {
-			return (*location);
+		T const &	operator->( void ) const {
+			return (*_location);
 		};
 
+		/*  -----------  + && - -----------  */
+
+		standard_tab_iterator<value_type>	operator+(difference_type const & toAdd) {
+			return (standard_tab_iterator<value_type>(this->_location + toAdd));
+		}
+
+		standard_tab_iterator<value_type>	operator-(difference_type const & toAdd) {
+			return (standard_tab_iterator<value_type>(this->_location - toAdd));
+		}
+
+		/*  -----------  += && -=  -----------  */
+
+		standard_tab_iterator<T> const & operator+=(difference_type const & toAddAssign) {
+			this->_location += toAddAssign;
+			return (*this);
+		}
+
+		standard_tab_iterator<T> const & operator-=(difference_type const & toAddAssign) {
+			this->_location -= toAddAssign;
+			return (*this);
+		}
 
 	private :
-		pointer	location;
+		pointer	_location;
 };
 
 template <typename T, typename Alloc = std::allocator<T> >
@@ -260,7 +294,28 @@ class vector {
 
 
 			/*  -----------  Methodes definition  -----------  */
-			void			insert(iterator position, size_type n, const value_type & val);
+
+			iterator insert(iterator position, const value_type& val){
+				size_type new_capacity = 0;
+				if (capacity != (new_capacity = _increase_capacity(size + 1, capacity))) {
+					size += 1;
+					first_element = _newTab(new_capacity);
+				} else {
+
+				}
+
+
+				return ();
+
+			}
+
+			void insert(iterator position, size_type n, const value_type& val);
+
+
+			template <class InputIterator>
+			void insert (iterator position, InputIterator first, InputIterator last);
+
+
 //			iterator		erase(iterator position);
 
 			iterator		begin( void ) {
@@ -270,11 +325,45 @@ class vector {
 			iterator		end( void ) {
 				return (iterator(first_element + size));
 			}
+
 	private :
+
+			/*  -------------  private methodes  -------------  */
+
+			size_type	_increase_capacity(size_type evaluated_size, capacity_tmp) {
+				if (capacity_tmp <= evaluated_size)
+					increase_capacity(capacity_tmp * 2);
+				if ( capacity_tmp > evaluated_size)
+				return (capacity);
+			}
+
+			pointer		_newTab(size_type new_capacity, iterator position, value_type const & val) {
+				pointer temp = mhandle.allocate(new_capacity);
+				_tabCopy(first_element, temp, position, val);
+				mhandle.destroy(first_element);
+				mhandle.deallocate(first_element, capacity);
+				capacity = new_capacity;
+				return (temp);
+			}
+
+			void	_tabCopy(pointer src, pointer dest, iterator position, value_type const & val){
+				for (iterator it = this->begin(), size_type i = 0; it != position && it != this->end(); i++, it++)
+					dest[i] = *it;
+				if (it == position){
+					dest[i] = val;
+					i++;
+				}
+				// reprise ici !!!!!
+
+
+			}
+
+			/*  -------------  private attributes  -------------  */
 			size_type		size;
 			size_type		capacity;
 			pointer 		first_element;
 			allocator_type	mhandle;
+
 };
 }
 
