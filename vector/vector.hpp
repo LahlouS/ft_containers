@@ -235,8 +235,13 @@ class	standard_tab_iterator : public std::iterator<std::random_access_iterator_t
 			return (*this);
 		}
 
+		pointer	getLocation(void) {
+			return (_location);
+		}
 	private :
+		/*  --------------  private attribute  ----------------  */
 		pointer	_location;
+
 };
 
 template <typename T, typename Alloc = std::allocator<T> >
@@ -291,25 +296,22 @@ class vector {
 				mhandle.deallocate(first_element, this->capacity);
 
 			}
-
-
-
 			/*  -----------  Methodes definition  -----------  */
 
-			iterator insert(iterator position, const value_type& val){
+			iterator insert(iterator position, const value_type& val) {
 				size_type	new_capacity = 0;
 				pointer		dest;
-				if (capacity != (new_capacity = _increase_capacity(size + 1, capacity))) {
+				if (capacity != (new_capacity = _increase_capacity(size + 1, capacity)))
 					dest = _allocNewTab(new_capacity);
 				else
 					dest = first_element;
-				_copyTab(dest, val, position);
-
-
-
-
-				return ();
-
+				_copyTab(dest, val, position, 1);
+				if (dest != first_element)
+					mhandle.deallocate(first_element, capacity);
+				first_element = dest;
+				size += 1;
+				capacity = new_capacity;
+				return (position + 1);
 			}
 
 			void insert(iterator position, size_type n, const value_type& val);
@@ -329,42 +331,77 @@ class vector {
 				return (iterator(first_element + size));
 			}
 
+			/*  --------------  print function for debbug  -------------  */
+
+			void	print(void) {
+				std::cout << "size : " << size << BN;
+				std::cout << "capacity : " << capacity << BN;
+				std::cout << "what is inside my vector : " << BN;
+				for (size_type i = 0; i < size; i++)
+					std::cout << first_element[i] << " ";
+				std::cout << BN;
+			}
+
 	private :
 
 			/*  -------------  private methodes  -------------  */
 
-			size_type	_increase_capacity(size_type evaluated_size, capacity_tmp) {
-				if (capacity_tmp < evaluated_size)
-					increase_capacity(capacity_tmp * 2);
+			size_type	_increase_capacity(size_type evaluated_size, size_type capacity_tmp) {
+				if (capacity_tmp < evaluated_size && capacity_tmp)
+					return (_increase_capacity(evaluated_size, capacity_tmp * 2));
+				if (capacity_tmp == 0)
+					return (_increase_capacity(evaluated_size, (capacity_tmp + 2) * 2));
 				if ( capacity_tmp >= evaluated_size)
-				return (capacity);
+					return (capacity_tmp);
+				return (capacity_tmp);
 			}
 
 			pointer		_allocNewTab(size_type new_capacity) {
-				return (mhandle.allocate(new_capacity))
+				return (mhandle.allocate(new_capacity));
 			}
 
-			_copyTab(pointer dest, const value_type& val, iterator position, size_type n) {
+			void	_copyTab(pointer dest, const value_type& val, iterator position, size_type n) {
 				value_type tempVal;
+				size_type i = 0;
+				iterator it;
 
-				for (size_type i = 0, vector<value_type>::it = this->begin(); it != this->end() && it != position; it++, i++) {
+				for (it = this->begin(); it != this->end() && it != position; it++, i++) {
 					tempVal = *it;
-					mhandle.destroy(&it);
+					mhandle.destroy(it.getLocation());
 					mhandle.construct(&dest[i], tempVal);
 				}
 				if (it == position)
-					while (--n)
-						mhandle.construct(&dest[i++], val);
-
-
+						_insert_element(iterator(&dest[i]), iterator(&dest[i] + (size - i)), val, n);
+				for (; it != this->end(); it++, i++) {
+					tempVal = *it;
+					mhandle.destroy(it.getLocation());
+					mhandle.construct(&dest[i], tempVal);
+				}
 			}
 
+
+			_insert_element(iterator start, iterator end, const value_type& val, size_type n) {
+				while (end != start) {
+					*(end + n) = *end;
+					end--;
+				}
+				*(end + n) = *end;
+				while (n--) {
+					*start = val;
+					start++;
+				}
+			}
+
+
 			/*  -------------  private attributes  -------------  */
+			private :
+
 			size_type		size;
 			size_type		capacity;
 			pointer 		first_element;
 			allocator_type	mhandle;
 
 };
+
 }
 #endif

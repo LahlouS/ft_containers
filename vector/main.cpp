@@ -1,3 +1,4 @@
+#include <vector>
 #include <iostream>
 #include <string>
 #include <typeinfo>
@@ -59,7 +60,6 @@ int main( void )
 	std::cout << "ft::vector<int>::iterator : " << ft::is_integral<ft::vector<int>::iterator>::value << BN;
 	std::cout << "short : " << ft::is_integral<short>::value << BN;
 	std::cout << "***" << BN;
-
 	{
 		std::cout << "testing iterators attributtes (const / non const)" << BN;
 		ft::vector<int> test(5, 12);
@@ -72,6 +72,34 @@ int main( void )
 			std::cout << *it++ << BN;
 
 	}
+
+	{
+		std::cout << BN << "***  TESTING INSERT FUNCTION  ***" << BN;
+		ft::vector<int> test_insert;
+
+		test_insert.insert(test_insert.begin(), 42);
+		test_insert.insert(test_insert.begin(), 56);
+		test_insert.insert(test_insert.begin(), 489);
+		test_insert.insert(test_insert.begin(), 1);
+		test_insert.insert(test_insert.begin(), 506);
+
+		std::cout << BN << "printing vector attributes :" << BN << BN;
+		test_insert.print();
+	}
+	{
+		std::cout << BN << "\n\n***  TESTING WITH THE REAL VECTOR  ***" << BN;
+		std::vector<int> test_insert;
+		test_insert.insert(test_insert.begin(), 42);
+		test_insert.insert(test_insert.begin(), 56);
+		test_insert.insert(test_insert.begin(), 489);
+		test_insert.insert(test_insert.begin(), 1);
+		test_insert.insert(test_insert.begin(), 506);
+		std::cout << test_insert[0] << " --> test_insert[0]" << BN;
+		std::cout << test_insert[1] << " --> test_insert[0]" << BN;
+		std::cout << test_insert[2] << " --> test_insert[0]" << BN;
+		std::cout << test_insert[3] << " --> test_insert[0]" << BN;
+		std::cout << test_insert[4] << " --> test_insert[0]" << BN;
+	}
 	return (0);
 }
 
@@ -79,11 +107,10 @@ int main( void )
 // #include <vector>
 
 // int main (void) {
-// 	std::vector<int> test(5, 13);
+// 	std::vector<int> test;
+// 	std::vector<int>::iterator it = test.begin();
 
-// 	for (int i = 0; i < 5; i++)
-// 		std::cout << test[i] << " ";
-// 	std::cout << BN;
+// 	std::cout << "\n";
 
 
 // 	return (0);
