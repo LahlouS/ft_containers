@@ -300,18 +300,17 @@ class vector {
 
 			iterator insert(iterator position, const value_type& val) {
 				size_type	new_capacity = 0;
-				pointer		dest;
+				pointer		dest = NULL;
+				size_type	pos = _findPosition(position);
+
 				if (capacity != (new_capacity = _increase_capacity(size + 1, capacity)))
 					dest = _allocNewTab(new_capacity);
-				else
-					dest = first_element;
-				_copyTab(dest, val, position, 1);
-				if (dest != first_element)
-					mhandle.deallocate(first_element, capacity);
-				first_element = dest;
-				size += 1;
+				if (dest)
+					_swapTab(dest);
+				_insertVal(val, 1, pos);
 				capacity = new_capacity;
-				return (position + 1);
+				size += 1;
+				return (iterator(first_element + pos));
 			}
 
 			void insert(iterator position, size_type n, const value_type& val);
@@ -346,6 +345,12 @@ class vector {
 
 			/*  -------------  private methodes  -------------  */
 
+			size_type _findPosition(iterator position) {
+				size_type i = 0;
+				for (iterator it = this->begin(); it != this->end() && it != position; it++, i++);
+				return (i);
+			}
+
 			size_type	_increase_capacity(size_type evaluated_size, size_type capacity_tmp) {
 				if (capacity_tmp < evaluated_size && capacity_tmp)
 					return (_increase_capacity(evaluated_size, capacity_tmp * 2));
@@ -360,36 +365,40 @@ class vector {
 				return (mhandle.allocate(new_capacity));
 			}
 
-			void	_copyTab(pointer dest, const value_type& val, iterator position, size_type n) {
-				value_type tempVal;
-				size_type i = 0;
-				iterator it;
-
-				for (it = this->begin(); it != this->end() && it != position; it++, i++) {
-					tempVal = *it;
-					mhandle.destroy(it.getLocation());
-					mhandle.construct(&dest[i], tempVal);
+			void	_copyTab(pointer dest) {
+				for (size_type i = 0; i < size; i++)
+					mhandle.construct(dest + i, first_element[i]);
+			}
+			void	_cleanOldTab(void) {
+				for (size_type i = 0; i < size; i++) {
+					mhandle.destroy(first_element + i);
 				}
-				if (it == position)
-						_insert_element(iterator(&dest[i]), iterator(&dest[i] + (size - i)), val, n);
-				for (; it != this->end(); it++, i++) {
-					tempVal = *it;
-					mhandle.destroy(it.getLocation());
-					mhandle.construct(&dest[i], tempVal);
-				}
+				mhandle.deallocate(first_element, size);
+			}
+			void	_swapTab(pointer newTab) {
+				_copyTab(newTab);
+				_cleanOldTab();
+				first_element = newTab;
 			}
 
+			void	_shiftValue(pointer tab, size_t position, size_type offset) {
+				pointer tab_tmp;
+				for (tab_tmp = tab + (this->size - (1 + position)); tab_tmp != tab; tab_tmp--) {
+					*(tab_tmp + offset) = *tab_tmp;
+				}
+				if (tab != (this->first_element + this->size))
+					*(tab_tmp + offset) = *tab_tmp;
+			}
 
-			_insert_element(iterator start, iterator end, const value_type& val, size_type n) {
-				while (end != start) {
-					*(end + n) = *end;
-					end--;
-				}
-				*(end + n) = *end;
-				while (n--) {
-					*start = val;
-					start++;
-				}
+			void	_putValue(pointer tab, size_type n, const value_type& val) {
+				while (n--)
+					mhandle.construct(tab++, val);
+			}
+
+			void	_insertVal(const value_type& val, size_type n, size_type position){
+				if (this->size != 0 && (first_element + position != first_element + this->size))
+					_shiftValue(first_element + position, position, n);
+				_putValue(first_element + position, n, val);
 			}
 
 
