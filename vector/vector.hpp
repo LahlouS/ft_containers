@@ -146,6 +146,7 @@ class	standard_tab_iterator : public std::iterator<std::random_access_iterator_t
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::pointer pointer;
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::difference_type difference_type;
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::value_type value_type;
+		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::reference reference;
 
 		/* ---------- Constructors ---------- */
 
@@ -204,11 +205,11 @@ class	standard_tab_iterator : public std::iterator<std::random_access_iterator_t
 
 		/*  -----------  * && -> -----------  */
 
-		T const &	operator*( void ) const {
+		reference	operator*( void ) const {
 			return (*_location);
 		}
 
-		T const &	operator->( void ) const {
+		pointer	operator->( void ) const {
 			return (*_location);
 		};
 
@@ -296,13 +297,15 @@ class vector {
 			/*  -----------  Methodes definition  -----------  */
 
 			iterator insert(iterator position, const value_type& val){
-				size_type new_capacity = 0;
+				size_type	new_capacity = 0;
+				pointer		dest;
 				if (capacity != (new_capacity = _increase_capacity(size + 1, capacity))) {
-					size += 1;
-					first_element = _newTab(new_capacity);
-				} else {
+					dest = _allocNewTab(new_capacity);
+				else
+					dest = first_element;
+				_copyTab(dest, val, position);
 
-				}
+
 
 
 				return ();
@@ -331,29 +334,27 @@ class vector {
 			/*  -------------  private methodes  -------------  */
 
 			size_type	_increase_capacity(size_type evaluated_size, capacity_tmp) {
-				if (capacity_tmp <= evaluated_size)
+				if (capacity_tmp < evaluated_size)
 					increase_capacity(capacity_tmp * 2);
-				if ( capacity_tmp > evaluated_size)
+				if ( capacity_tmp >= evaluated_size)
 				return (capacity);
 			}
 
-			pointer		_newTab(size_type new_capacity, iterator position, value_type const & val) {
-				pointer temp = mhandle.allocate(new_capacity);
-				_tabCopy(first_element, temp, position, val);
-				mhandle.destroy(first_element);
-				mhandle.deallocate(first_element, capacity);
-				capacity = new_capacity;
-				return (temp);
+			pointer		_allocNewTab(size_type new_capacity) {
+				return (mhandle.allocate(new_capacity))
 			}
 
-			void	_tabCopy(pointer src, pointer dest, iterator position, value_type const & val){
-				for (iterator it = this->begin(), size_type i = 0; it != position && it != this->end(); i++, it++)
-					dest[i] = *it;
-				if (it == position){
-					dest[i] = val;
-					i++;
+			_copyTab(pointer dest, const value_type& val, iterator position, size_type n) {
+				value_type tempVal;
+
+				for (size_type i = 0, vector<value_type>::it = this->begin(); it != this->end() && it != position; it++, i++) {
+					tempVal = *it;
+					mhandle.destroy(&it);
+					mhandle.construct(&dest[i], tempVal);
 				}
-				// reprise ici !!!!!
+				if (it == position)
+					while (--n)
+						mhandle.construct(&dest[i++], val);
 
 
 			}
@@ -366,8 +367,4 @@ class vector {
 
 };
 }
-
-
 #endif
-
-

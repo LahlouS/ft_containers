@@ -60,6 +60,18 @@ int main( void )
 	std::cout << "short : " << ft::is_integral<short>::value << BN;
 	std::cout << "***" << BN;
 
+	{
+		std::cout << "testing iterators attributtes (const / non const)" << BN;
+		ft::vector<int> test(5, 12);
+		ft::vector<int>::iterator it = test.begin();
+
+		*it = 16;
+		*(it + 1) = 42;
+
+		while (it != test.end())
+			std::cout << *it++ << BN;
+
+	}
 	return (0);
 }
 
