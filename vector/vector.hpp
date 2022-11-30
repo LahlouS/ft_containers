@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include "traits_utils.hpp"
 #define BN "\n"
 
 namespace ft {
@@ -96,41 +97,7 @@ namespace ft {
 	};
 
 
-	/*---------------  Iterators_traits  -----------------*/
 
-	template <class Iterator>
-	struct iterator_traits {
-
-		typedef	typename	Iterator::value_type		value_type;
-		typedef	typename	Iterator::difference_type	difference_type;
-		typedef	typename	Iterator::pointer			pointer;
-		typedef	typename	Iterator::reference 		reference;
-		typedef	typename	Iterator::iterator_category	iterator_category;
-
-	};
-
-	template <class T>
-	struct iterator_traits<T*> {
-
-		typedef	T								value_type;
-		typedef	T*								pointer;
-		typedef	T&								reference;
-		typedef	std::ptrdiff_t					difference;
-		typedef	std::random_access_iterator_tag	iterator_category;
-
-	};
-
-
-	template <class T>
-	struct iterator_traits<const T*> {
-
-		typedef	const T									value_type;
-		typedef	const T*								pointer;
-		typedef	const T&								reference;
-		typedef	const std::ptrdiff_t					difference;
-		typedef	const std::random_access_iterator_tag	iterator_category;
-
-	};
 
 	/*--------------  Iterator_difference  ---------*/
 	template <typename T_iterator>
@@ -168,10 +135,10 @@ namespace ft {
 		return (i);
 	}
 
-
-template <typename T>
-class	standard_tab_iterator : public std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&> {
-	public :
+	/*  ------------------  MY STANDARD ITERATOR  -----------------*/
+	template <typename T>
+	class	standard_tab_iterator : public std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&> {
+		public :
 
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::pointer pointer;
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::difference_type difference_type;
@@ -275,15 +242,16 @@ class	standard_tab_iterator : public std::iterator<std::random_access_iterator_t
 		pointer	getLocation(void) {
 			return (_location);
 		}
-	private :
+		private :
 		/*  --------------  private attribute  ----------------  */
 		pointer	_location;
 
-};
+	};
 
-template <typename T, typename Alloc = std::allocator<T> >
-class vector {
-	public :
+		/*  -----------------  MY VECTOR  ---------------------  */
+	template <typename T, typename Alloc = std::allocator<T> >
+	class vector {
+		public :
 			/*  -----------  Member Data type definition  -----------  */
 			typedef typename Alloc::value_type						value_type;
 			typedef 		 Alloc									allocator_type;
@@ -293,12 +261,10 @@ class vector {
 			typedef typename Alloc::size_type						size_type;
 			typedef typename Alloc::pointer							pointer;
 			typedef 		 const pointer							const_pointer;
-
-			typedef 		 standard_tab_iterator<T>			iterator;
-			typedef 		 standard_tab_iterator<const T>		const_iterator;
-
-//			typedef			 reverse_iterator<iterator>			reverse_iterator;
-//			typedef			 reverse_iterator<const_iterator>	const_reverse_iterator;
+			typedef 		 standard_tab_iterator<T>				iterator;
+			typedef 		 standard_tab_iterator<const T>			const_iterator;
+			typedef			 reverse_iterator<const_iterator>		const_reverse_iterator;
+			typedef			 reverse_iterator<iterator>				reverse_iterator;
 
 			/*  -----------  Constructors definition  -----------  */
 			explicit vector(const allocator_type& alloc = allocator_type()) : size(0), capacity(0), first_element(NULL), mhandle(alloc) {  /*  nothing to put for the moment  */  }
@@ -309,7 +275,6 @@ class vector {
 					mhandle.construct(first_element + n, val);
 				mhandle.construct(first_element + n, val);
 			}
-
 			template <class InputIterator>
 			vector(InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, InputIterator>::type = NULL, const allocator_type& alloc = allocator_type())
 			: size(0), capacity(0), first_element(NULL), mhandle(alloc) {
@@ -370,8 +335,29 @@ class vector {
 				}
 			}
 
+			iterator		erase(iterator position) {
+				if (position != this->end() - 1)
+					return (erase(position, position + 1));
+				else
+				{
+					mhandle.destroy(first_element + (size - 1));
+					size -= 1;
+					return (this->end());
+				}
+			}
 
-//			iterator		erase(iterator position);
+			iterator		erase(iterator first, iterator last) {
+				size_type diff = iteratorDifference(first, last);
+				pointer		lastOne = this->end().getLocation() - 1;
+				for (iterator first_cpy = first;first_cpy != last; first_cpy++) {
+					mhandle.destroy(first_cpy.getLocation());
+					if ((first_cpy.getLocation() + diff) < lastOne)
+						mhandle.construct(first.getLocation(), *(first_cpy.getLocation() + diff));
+				}
+				this->size -= diff;
+				return (first);
+			}
+
 
 			iterator		begin( void ) {
 				return iterator(first_element);
@@ -381,6 +367,13 @@ class vector {
 				return (iterator(first_element + size));
 			}
 
+			reverse_iterator		rbegin( void ) {
+				return reverse_iterator(first_element + size);
+			}
+
+			reverse_iterator		rend( void ) {
+				return (reverse_iterator(first_element));
+			}
 			/*  --------------  print function for debbug  -------------  */
 
 			void	print(void) {
@@ -392,7 +385,7 @@ class vector {
 				std::cout << BN;
 			}
 
-	private :
+		private :
 
 			/*  -------------  private methodes  -------------  */
 
@@ -431,11 +424,15 @@ class vector {
 				this->first_element = newTab;
 			}
 
-			void	_shiftValue(pointer tab, size_t position, size_type offset) {
+			void	_shiftRight(pointer tab, size_type position, size_type offset) {
 				pointer tab_tmp;
 				for (tab_tmp = tab + (this->size - (1 + position)); tab_tmp != tab; tab_tmp--)
-					*(tab_tmp + offset) = *tab_tmp;
-				*(tab_tmp + offset) = *tab_tmp;
+				{
+					mhandle.construct(tab_tmp + offset, *tab_tmp);
+					mhandle.destroy(tab_tmp);
+				}
+					mhandle.construct(tab_tmp + offset, *tab_tmp);
+					mhandle.destroy(tab_tmp);
 			}
 
 			void	_putValue(pointer tab, size_type n, const value_type& val) {
@@ -445,7 +442,7 @@ class vector {
 
 			void	_insertVal(const value_type& val, size_type n, size_type position){
 				if (this->size != 0 && (first_element + position != first_element + this->size))
-					_shiftValue(first_element + position, position, n);
+					_shiftRight(first_element + position, position, n);
 				_putValue(first_element + position, n, val);
 			}
 
@@ -458,7 +455,8 @@ class vector {
 			pointer 		first_element;
 			allocator_type	mhandle;
 
-};
+	};
 
 }
+
 #endif
