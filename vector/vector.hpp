@@ -8,6 +8,8 @@
 
 namespace ft {
 
+
+
 	/*---------------  remove_cv  -----------------*/
 	template< class T > struct remove_cv                   { typedef T type; };
 	template< class T > struct remove_cv<const T>          { typedef T type; };
@@ -94,49 +96,77 @@ namespace ft {
 	};
 
 
-
-
-
-
-
-
-
-
 	/*---------------  Iterators_traits  -----------------*/
 
-template <class Iterator>
-struct iterator_traits {
+	template <class Iterator>
+	struct iterator_traits {
 
-	typedef	typename	Iterator::value_type		value_type;
-	typedef	typename	Iterator::difference_type	difference_type;
-	typedef	typename	Iterator::pointer			pointer;
-	typedef	typename	Iterator::reference 		reference;
-	typedef	typename	Iterator::iterator_category	iterator_category;
+		typedef	typename	Iterator::value_type		value_type;
+		typedef	typename	Iterator::difference_type	difference_type;
+		typedef	typename	Iterator::pointer			pointer;
+		typedef	typename	Iterator::reference 		reference;
+		typedef	typename	Iterator::iterator_category	iterator_category;
 
-};
+	};
 
-template <class T>
-struct iterator_traits<T*> {
+	template <class T>
+	struct iterator_traits<T*> {
 
-	typedef	T								value_type;
-	typedef	T*								pointer;
-	typedef	T&								reference;
-	typedef	std::ptrdiff_t					difference;
-	typedef	std::random_access_iterator_tag	iterator_category;
+		typedef	T								value_type;
+		typedef	T*								pointer;
+		typedef	T&								reference;
+		typedef	std::ptrdiff_t					difference;
+		typedef	std::random_access_iterator_tag	iterator_category;
 
-};
+	};
 
 
-template <class T>
-struct iterator_traits<const T*> {
+	template <class T>
+	struct iterator_traits<const T*> {
 
-	typedef	const T									value_type;
-	typedef	const T*								pointer;
-	typedef	const T&								reference;
-	typedef	const std::ptrdiff_t					difference;
-	typedef	const std::random_access_iterator_tag	iterator_category;
+		typedef	const T									value_type;
+		typedef	const T*								pointer;
+		typedef	const T&								reference;
+		typedef	const std::ptrdiff_t					difference;
+		typedef	const std::random_access_iterator_tag	iterator_category;
 
-};
+	};
+
+	/*--------------  Iterator_difference  ---------*/
+	template <typename T_iterator>
+	typename ft::iterator_traits<T_iterator>::difference_type	iteratorDifference(T_iterator first, T_iterator last) {
+		return (compute_diffence(first, last, typename ft::iterator_traits<T_iterator>::iterator_category()));
+	}
+
+	template <typename T_iterator>
+	typename ft::iterator_traits<T_iterator>::difference			iteratorDifference(T_iterator first, T_iterator last) {
+		return (last - first);
+	}
+
+	template <typename T_iterator>
+	typename ft::iterator_traits<T_iterator>::difference_type	compute_diffence(T_iterator first, T_iterator last, std::random_access_iterator_tag) {
+		return (last - first);
+	}
+
+	template <typename T_iterator>
+	typename ft::iterator_traits<T_iterator>::difference_type	compute_diffence(T_iterator first, T_iterator last, std::bidirectional_iterator_tag) {
+		size_t	i = 0;
+		while (first != last){
+			first++;
+			i++;
+		}
+		return (i);
+	}
+
+	template <typename T_iterator>
+	typename ft::iterator_traits<T_iterator>::difference_type	compute_diffence(T_iterator first, T_iterator last, std::input_iterator_tag) {
+		size_t	i = 0;
+		while (first != last){
+			first++;
+			i++;
+		}
+		return (i);
+	}
 
 
 template <typename T>
@@ -151,7 +181,7 @@ class	standard_tab_iterator : public std::iterator<std::random_access_iterator_t
 		/* ---------- Constructors ---------- */
 
 		standard_tab_iterator() : _location(NULL) {  /*  nothing to put for the moment  */  }
-		standard_tab_iterator(T* start_addr) {
+		standard_tab_iterator(pointer start_addr) {
 			_location = start_addr;
 		}
 		standard_tab_iterator(standard_tab_iterator<T> const & itToCopy) {
@@ -223,6 +253,13 @@ class	standard_tab_iterator : public std::iterator<std::random_access_iterator_t
 			return (standard_tab_iterator<value_type>(this->_location - toAdd));
 		}
 
+		difference_type	operator+(standard_tab_iterator<value_type> const & toAdd) {
+			return (this->_location + toAdd._location);
+		}
+
+		difference_type	operator-(standard_tab_iterator<value_type> const & toAdd) {
+			return (this->_location - toAdd._location);
+		}
 		/*  -----------  += && -=  -----------  */
 
 		standard_tab_iterator<T> const & operator+=(difference_type const & toAddAssign) {
@@ -296,28 +333,42 @@ class vector {
 				mhandle.deallocate(first_element, this->capacity);
 
 			}
+
+			/*  -----------  Overload function    -------------*/
+
+			value_type			operator[](size_type i) {
+				return (*(this->first_element + i));
+			}
+
 			/*  -----------  Methodes definition  -----------  */
 
 			iterator insert(iterator position, const value_type& val) {
+				return (insert(position, 1, val));
+			}
+
+			iterator insert(iterator position, size_type n, const value_type& val) {
 				size_type	new_capacity = 0;
 				pointer		dest = NULL;
 				size_type	pos = _findPosition(position);
 
-				if (capacity != (new_capacity = _increase_capacity(size + 1, capacity)))
+				if (capacity != (new_capacity = _increase_capacity(size + n, capacity)))
 					dest = _allocNewTab(new_capacity);
 				if (dest)
 					_swapTab(dest);
-				_insertVal(val, 1, pos);
+				_insertVal(val, n, pos);
 				capacity = new_capacity;
-				size += 1;
+				size += n;
 				return (iterator(first_element + pos));
 			}
 
-			void insert(iterator position, size_type n, const value_type& val);
-
 
 			template <class InputIterator>
-			void insert (iterator position, InputIterator first, InputIterator last);
+			void insert (iterator position, InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, InputIterator>::type = NULL) {
+				while (first != last) {
+					insert(position, 1, *first);
+					first++;
+				}
+			}
 
 
 //			iterator		erase(iterator position);
@@ -370,24 +421,21 @@ class vector {
 					mhandle.construct(dest + i, first_element[i]);
 			}
 			void	_cleanOldTab(void) {
-				for (size_type i = 0; i < size; i++) {
+				for (size_type i = 0; i < size; i++)
 					mhandle.destroy(first_element + i);
-				}
 				mhandle.deallocate(first_element, size);
 			}
 			void	_swapTab(pointer newTab) {
 				_copyTab(newTab);
 				_cleanOldTab();
-				first_element = newTab;
+				this->first_element = newTab;
 			}
 
 			void	_shiftValue(pointer tab, size_t position, size_type offset) {
 				pointer tab_tmp;
-				for (tab_tmp = tab + (this->size - (1 + position)); tab_tmp != tab; tab_tmp--) {
+				for (tab_tmp = tab + (this->size - (1 + position)); tab_tmp != tab; tab_tmp--)
 					*(tab_tmp + offset) = *tab_tmp;
-				}
-				if (tab != (this->first_element + this->size))
-					*(tab_tmp + offset) = *tab_tmp;
+				*(tab_tmp + offset) = *tab_tmp;
 			}
 
 			void	_putValue(pointer tab, size_type n, const value_type& val) {
