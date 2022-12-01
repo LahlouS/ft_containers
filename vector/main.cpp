@@ -214,69 +214,113 @@ int main( void )
 // 	std::cout << "ici mon test : " << test[2] << "\n";
 // 	std::cout << "\n";
 
-{
-	std::cout << "TESTING _capacity FUNCTIONS : " << BN << BN;
-		std::vector<int>	v;
-		ft::vector<int>		v_bis;
-		int t[10] = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-		v.insert(v.begin(), t, t + 10);
-		v_bis.insert(v_bis.begin(), t, t + 10);
+// {
+// 	std::cout << "TESTING _capacity FUNCTIONS : " << BN << BN;
+// 		std::vector<int>	v;
+// 		ft::vector<int>		v_bis;
+// 		int t[10] = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+// 		v.insert(v.begin(), t, t + 10);
+// 		v_bis.insert(v_bis.begin(), t, t + 10);
 
-		std::cout << "v - v_bis" << BN;
-		for (size_t i = 0; i < 10; i++)
-			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
-		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
-		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
+// 		std::cout << "v - v_bis" << BN;
+// 		for (size_t i = 0; i < 10; i++)
+// 			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
+// 		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
+// 		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
 
-		std::cout << "\n\n\nNow testing the resize function with smaller size (5) : \n";
-		v.resize(5);
-		v_bis.resize(5);
-		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
-		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
-		std::cout << "v - v_bis" << BN;
-		for (size_t i = 0; i < v_bis.size(); i++)
-			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
-		std::cout << "\n\n\nNow testing the resize function with greater size (10) with init at 42 : \n";
-		v.resize(10, 42);
-		v_bis.resize(10, 42);
-		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
-		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
-		std::cout << "v - v_bis" << BN;
-		for (size_t i = 0; i < v_bis.size(); i++)
-			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
+// 		std::cout << "\n\n\nNow testing the resize function with smaller size (5) : \n";
+// 		v.resize(5);
+// 		v_bis.resize(5);
+// 		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
+// 		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
+// 		std::cout << "v - v_bis" << BN;
+// 		for (size_t i = 0; i < v_bis.size(); i++)
+// 			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
+// 		std::cout << "\n\n\nNow testing the resize function with greater size (10) with init at 42 : \n";
+// 		v.resize(10, 42);
+// 		v_bis.resize(10, 42);
+// 		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
+// 		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
+// 		std::cout << "v - v_bis" << BN;
+// 		for (size_t i = 0; i < v_bis.size(); i++)
+// 			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
 
-		std::cout << "\n\n///////////////////////////////////\n\n";
-		v_bis.print();
-		std::cout << "\n\n/////////////////\n\n";
+// 		std::cout << "\n\n///////////////////////////////////\n\n";
+// 		v_bis.print();
+// 		std::cout << "\n\n/////////////////\n\n";
 
-		std::cout << "\n\n\nNow testing the resize function with greater size AND beyond capacity (40) with init at 42 : \n";
-		v.resize(40, 42);
-		v_bis.resize(40, 42);
-		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
-		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
-		std::cout << "v - v_bis" << BN;
-		for (size_t i = 0; i < v_bis.size(); i++)
-			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
+// 		std::cout << "\n\n\nNow testing the resize function with greater size AND beyond capacity (40) with init at 42 : \n";
+// 		v.resize(40, 42);
+// 		v_bis.resize(40, 42);
+// 		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
+// 		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
+// 		std::cout << "v - v_bis" << BN;
+// 		for (size_t i = 0; i < v_bis.size(); i++)
+// 			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
 
-		/* LE VECTOR OFFICIEL JETTE UNE ERREUR TANDIS QUE TOI TU SEGFAULT 
-		std::cout << "\n\n\nNow testing the resize function with fucked up things : \n";
-		v.resize(-5, 42);
-		v_bis.resize(-5, 42);
-		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
-		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
-		std::cout << "v - v_bis" << BN;
-		for (size_t i = 0; i < v_bis.size(); i++)
-			std::cout << " " << v[i] << " - " << v_bis[i] << BN;*/
+// 		/* LE VECTOR OFFICIEL JETTE UNE ERREUR TANDIS QUE TOI TU SEGFAULT
+// 		std::cout << "\n\n\nNow testing the resize function with fucked up things : \n";
+// 		v.resize(-5, 42);
+// 		v_bis.resize(-5, 42);
+// 		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
+// 		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
+// 		std::cout << "v - v_bis" << BN;
+// 		for (size_t i = 0; i < v_bis.size(); i++)
+// 			std::cout << " " << v[i] << " - " << v_bis[i] << BN;*/
+
+// 	}
+
+	// {
+	// 	std::vector<int>	v;
+	// 	ft::vector<int>		v_bis;
+
+	// 	if (v.empty() && v_bis.empty())
+	// 		std::cout << "empty() seems to work 1/2\n\n";
+	// 	int t[10] = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	// 	v.insert(v.begin(), t, t + 10);
+	// 	v_bis.insert(v_bis.begin(), t, t + 10);
+	// 	if (!v.empty() && !v_bis.empty())
+	// 		std::cout << "empty() seems to work 2/2\n\n";
+
+	// 	std::cout << v.capacity() << "official vector capacity\n";
+	// 	std::cout << v_bis.capacity() << "my vector capacity\n";
+	// 	std::cout << BN;
+	// 	v.reserve(50);
+	// 	v_bis.reserve(50);
+	// 	std::cout << v.capacity() << " after reserving 50\n";
+	// 	std::cout << v_bis.capacity() << " after reserving 50\n";
+
+	// 	ft::vector<int>::iterator it_bis = v_bis.begin();
+	// 	std::vector<int>::iterator it = v.begin();
+	// 	std::cout << "printing to see if everything is all right :\n*it++  -  " "*it_bis++" << BN;
+	// 	for (int i = 0; i < 10; i++)
+	// 		std::cout << *it++ << "  -  " << *it_bis++ << BN;
+
+	// 	v_bis.shrink_to_fit();
+	// 	it_bis = v_bis.begin();
+	// 	std::cout << BN << "and know after shrink to fit call\n*it++  -  " "*it_bis++" << BN;
+	// 	for (int i = 0; i < 10; i++)
+	// 		std::cout << *it_bis++ << BN;
+
+	// 	std::cout << v_bis.capacity() << " my vector capacity\n";
 
 
+	// 	std::cout << BN;
+	// }
+	{
+		std::cout << "****  TESTING ACESS ELEMENTS  ****" << BN << BN;
+			std::vector<int>	v(5);
+			ft::vector<int>		v_bis(5);
 
-
-
-
-
-
-
-}
+			try {
+				std::cout << "normal utilisation :" << v.at(0) << " " << v_bis.at(0) << BN;
+				//v.at(12);
+			} catch (std::exception const & e) {
+				std::cout << e.what();
+			}
+		std::cout << "v.capacity() : " << v.capacity() << BN;
+		std::cout << "v_bis.capacity() : " << v_bis.capacity() << BN;
+	}
 
  	return (0);
 }

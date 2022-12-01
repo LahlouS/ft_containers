@@ -264,18 +264,18 @@ namespace ft {
 	class vector {
 		public :
 			/*  -----------  Member Data type definition  -----------  */
-			typedef typename Alloc::value_type						value_type;
-			typedef 		 Alloc									allocator_type;
-			typedef typename Alloc::reference						reference;
-			typedef			 const reference						const_reference;
-			typedef typename Alloc::difference_type					difference_type;
-			typedef typename Alloc::size_type						size_type;
-			typedef typename Alloc::pointer							pointer;
-			typedef 		 const pointer							const_pointer;
-			typedef 		 standard_tab_iterator<T>				iterator;
-			typedef 		 standard_tab_iterator<const T>			const_iterator;
-			typedef			 reverse_iterator<const_iterator>		const_reverse_iterator;
-			typedef			 reverse_iterator<iterator>				reverse_iterator;
+			typedef typename Alloc::value_type							value_type;
+			typedef 		 Alloc										allocator_type;
+			typedef typename Alloc::reference							reference;
+			typedef			 const reference							const_reference;
+			typedef typename Alloc::difference_type						difference_type;
+			typedef typename Alloc::size_type							size_type;
+			typedef typename Alloc::pointer								pointer;
+			typedef 		 const pointer								const_pointer;
+			typedef 		 standard_tab_iterator<value_type>			iterator;
+			typedef 		 standard_tab_iterator<const value_type>	const_iterator;
+			typedef			 reverse_iterator<const_iterator>			const_reverse_iterator;
+			typedef			 reverse_iterator<iterator>					reverse_iterator;
 
 			/*  -----------  Constructors definition  -----------  */
 			explicit vector(const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _first_element(NULL), _mhandle(alloc) {  /*  nothing to put for the moment  */  }
@@ -301,6 +301,12 @@ namespace ft {
 					first++;
 					i++;
 				}
+			}
+
+			vector& operator= (const vector& x) {
+				this->_mhandle = x.get_allocator();
+				this->assign(x.begin(), x.end());
+				return (*this);
 			}
 
 			~vector(){
@@ -357,7 +363,7 @@ namespace ft {
 				}
 				this->_capacity = n;
 			}
-
+			// not in c++98 :/
 			void shrink_to_fit(void) {
 				if (this->_size > 0)
 					reserve(this->_size, 1);
@@ -365,8 +371,43 @@ namespace ft {
 
 
 			/* ------------ Acess Elements ---------------------*/
-			reference at (size_type n);const_reference at (size_type n) const; // this throw an exception
+			reference at (size_type n) {
+				if (n >= 0 && n < this->_size)
+					return (*(this->_first_element + n));
+				else
+					throw std::out_of_range("Halte : l'argument transmis a cette fonction semble 'out-of-range' si je ne m'abuse\n");
+			}
 
+			const_reference at (size_type n) const {
+				if (n >= 0 && n < this->_size)
+					return (*(this->_first_element + n));
+				else
+					throw std::out_of_range("Halte : l'argument transmis a cette fonction semble 'out-of-range' si je ne m'abuse\n");
+			}
+
+			reference front(void){
+				return (*(this->_first_element));
+			}
+
+			const_reference front() const{
+				return (*(this->_first_element));
+			}
+
+			reference back() {
+				return (*(this->_first_element + (this->_size - 1)));
+			}
+
+			const_reference back() const {
+				return (*(this->_first_element + (this->_size - 1)));
+			}
+
+			pointer data() {
+				return (_first_element);
+			}
+
+			const_pointer data() const {
+				return (_first_element);
+			}
 			/*  -----------  Modifiers functions  ------------  */
 
 			iterator insert(iterator position, const value_type& val) {
@@ -420,6 +461,39 @@ namespace ft {
 				return (first);
 			}
 
+			template <class InputIterator>
+			void assign (InputIterator first, InputIterator last, typename ft::enable_if<!is_integral<InputIterator>::value, InputIterator>::type = NULL) {
+				this->erase(this->begin(), this->end());
+				this->insert(this->end(), first, last);
+			}
+
+
+			void assign (size_type n, const value_type& val) {
+				if (this->_size != 0)
+					this->erase(this->begin(), this->end());
+				this->insert(this->end(), n, val);
+			}
+
+			void push_back (const value_type& val) {
+				this->insert(this->end(), val);
+			}
+
+			void pop_back(void) {
+				this->erase(this->end());
+			}
+
+			void swap (vector& x) {
+				ft::vector<value_type> temp(this->begin(), this->end());
+				this->assign(x.begin(), x.end());
+				x.assign(temp.begin(), temp.end());
+			}
+
+			void	clear(void) {
+				if (this->_size > 0)
+					this->erase(this->begin(), this->end());
+			}
+
+			/*  -------------  Iterators Functions  -------------*/
 
 			iterator		begin( void ) {
 				return (iterator(_first_element));
@@ -466,6 +540,11 @@ namespace ft {
 
 			const_reverse_iterator crend() const /*noexcept*/ {
 				return (const_reverse_iterator(_first_element));
+			}
+			/*  -----------------------  Other  --------------------------*/
+
+			allocator_type get_allocator() const {
+				return (this->mhandle);
 			}
 
 			/*  --------------  print function for debbug  -------------  */

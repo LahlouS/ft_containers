@@ -1,25 +1,32 @@
 #include <vector>
 #include <iostream>
 
+#define BN "\n"
 
 int main(void){
 	std::vector<int> v;
-	int t[10] = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	int t[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	v.insert(v.begin(), t, t + 10);
 
 	for (int i = 0; i < 10; i++)
 		std::cout << v[i] << " ";
-	std::cout << std::endl;
-	std::cout << "rend() : " << *(v.rend().base()) << "\n";
-	std::cout << "rbegin() : " << (v.rbegin())[0] << "\n";
-	std::cout << std::endl;
+	std::cout << BN;
+	std::cout << BN;
 
-	//std::cout << "testing reverse iterator from reverse iterator : " << "\n\n";
-	//typedef std::vector<int>::iterator iter_type;
-	//std::reverse_iterator<iter_type> test(v.end());
+	v.insert(v.begin(), t + 2, t + 4);
 
-	//std::cout << "test : " << *test << std::endl;
-	std::cout << "\n\n******FIN DU TEST******\n";
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << BN;
+	std::cout << BN;
+
+	v.assign(5, 42);
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << " ";
+	std::cout << BN;
+	std::cout << BN;
+
+	v.emplace(v.begin(), 12);
 	return (0);
 }
 
