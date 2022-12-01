@@ -11,7 +11,7 @@ int main(void){
 		std::cout << v[i] << " ";
 	std::cout << std::endl;
 	std::cout << "rend() : " << *(v.rend().base()) << "\n";
-	std::cout << "rbegin() : " << *(v.rbegin().base() - 1) << "\n";
+	std::cout << "rbegin() : " << (v.rbegin())[0] << "\n";
 	std::cout << std::endl;
 
 	//std::cout << "testing reverse iterator from reverse iterator : " << "\n\n";

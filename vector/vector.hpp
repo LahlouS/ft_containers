@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <exception>
 #include "traits_utils.hpp"
 #define BN "\n"
 
@@ -135,7 +136,7 @@ namespace ft {
 		return (i);
 	}
 
-	/*  ------------------  MY STANDARD ITERATOR  -----------------*/
+	/*  ------------------  MY STANDARD_ITERATOR  -----------------*/
 	template <typename T>
 	class	standard_tab_iterator : public std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&> {
 		public :
@@ -220,6 +221,14 @@ namespace ft {
 			return (standard_tab_iterator<value_type>(this->_location - toAdd));
 		}
 
+		standard_tab_iterator<value_type>	operator+(difference_type const & toAdd) const {
+			return (standard_tab_iterator<value_type>(this->_location + toAdd));
+		}
+
+		standard_tab_iterator<value_type>	operator-(difference_type const & toAdd) const {
+			return (standard_tab_iterator<value_type>(this->_location - toAdd));
+		}
+
 		difference_type	operator+(standard_tab_iterator<value_type> const & toAdd) {
 			return (this->_location + toAdd._location);
 		}
@@ -248,6 +257,8 @@ namespace ft {
 
 	};
 
+
+
 		/*  -----------------  MY VECTOR  ---------------------  */
 	template <typename T, typename Alloc = std::allocator<T> >
 	class vector {
@@ -267,45 +278,96 @@ namespace ft {
 			typedef			 reverse_iterator<iterator>				reverse_iterator;
 
 			/*  -----------  Constructors definition  -----------  */
-			explicit vector(const allocator_type& alloc = allocator_type()) : size(0), capacity(0), first_element(NULL), mhandle(alloc) {  /*  nothing to put for the moment  */  }
+			explicit vector(const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _first_element(NULL), _mhandle(alloc) {  /*  nothing to put for the moment  */  }
 
-			explicit vector(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : size(n), capacity(n), first_element(NULL), mhandle(alloc) {
-				first_element = mhandle.allocate(size);
+			explicit vector(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _size(n), _capacity(n), _first_element(NULL), _mhandle(alloc) {
+				_first_element = _mhandle.allocate(_size);
 				while (--n)
-					mhandle.construct(first_element + n, val);
-				mhandle.construct(first_element + n, val);
+					_mhandle.construct(_first_element + n, val);
+				_mhandle.construct(_first_element + n, val);
 			}
 			template <class InputIterator>
 			vector(InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, InputIterator>::type = NULL, const allocator_type& alloc = allocator_type())
-			: size(0), capacity(0), first_element(NULL), mhandle(alloc) {
-				this->mhandle = alloc;
+			: _size(0), _capacity(0), _first_element(NULL), _mhandle(alloc) {
+				this->_mhandle = alloc;
 				InputIterator temp = first;
 				size_t	i = 0;
 				while (temp++ != last)
-					this->size++;
-				this->capacity = this->size;
-				first_element = mhandle.allocate(size);
+					this->_size++;
+				this->_capacity = this->_size;
+				_first_element = _mhandle.allocate(_size);
 				while (first != last) {
-					mhandle.construct(first_element + i, *first);
+					_mhandle.construct(_first_element + i, *first);
 					first++;
 					i++;
 				}
 			}
 
 			~vector(){
-				for (size_type tmp = this->size; tmp < this->size; tmp++)
-					mhandle.destroy(first_element + tmp);
-				mhandle.deallocate(first_element, this->capacity);
+				for (size_type tmp = this->_size; tmp < this->_size; tmp++)
+					_mhandle.destroy(_first_element + tmp);
+				_mhandle.deallocate(_first_element, this->_capacity);
 
 			}
 
 			/*  -----------  Overload function    -------------*/
 
-			value_type			operator[](size_type i) {
-				return (*(this->first_element + i));
+			reference operator[] (size_type n) {
+				return (*(this->_first_element + n));
+			}
+
+			const_reference operator[] (size_type n) const {
+				return (*(this->_first_element + n));
 			}
 
 			/*  -----------  Methodes definition  -----------  */
+
+			/*  -----------  capacity functions  ------------  */
+			size_type	size() const {
+				return (this->_size);
+			}
+
+			size_type	capacity() const {
+				return (this->_capacity);
+			}
+
+			size_type	max_size() const {
+				return (_mhandle.max_size());
+			}
+
+			void		resize (size_type new_size, value_type val = value_type()) {
+				if (new_size < this->_size)
+					erase(iterator(_first_element + (new_size - 1)), iterator(end()));
+				else if (new_size > this->_size)
+					insert(end(), (new_size - this->_size), val);
+				this->_size = new_size;
+			}
+
+			bool empty() const {
+				return (this->_size == 0);
+			}
+
+			void	reserve(size_type n, bool intern = 0) {
+				pointer		dest = NULL;
+				if (n > this->_capacity || intern)
+				{
+					dest = _allocNewTab(n);
+					if (dest)
+						_swapTab(dest);
+				}
+				this->_capacity = n;
+			}
+
+			void shrink_to_fit(void) {
+				if (this->_size > 0)
+					reserve(this->_size, 1);
+			}
+
+
+			/* ------------ Acess Elements ---------------------*/
+			reference at (size_type n);const_reference at (size_type n) const; // this throw an exception
+
+			/*  -----------  Modifiers functions  ------------  */
 
 			iterator insert(iterator position, const value_type& val) {
 				return (insert(position, 1, val));
@@ -316,14 +378,14 @@ namespace ft {
 				pointer		dest = NULL;
 				size_type	pos = _findPosition(position);
 
-				if (capacity != (new_capacity = _increase_capacity(size + n, capacity)))
+				if (_capacity != (new_capacity = _increase_capacity(_size + n, _capacity)))
 					dest = _allocNewTab(new_capacity);
 				if (dest)
 					_swapTab(dest);
 				_insertVal(val, n, pos);
-				capacity = new_capacity;
-				size += n;
-				return (iterator(first_element + pos));
+				_capacity = new_capacity;
+				_size += n;
+				return (iterator(_first_element + pos));
 			}
 
 
@@ -340,8 +402,8 @@ namespace ft {
 					return (erase(position, position + 1));
 				else
 				{
-					mhandle.destroy(first_element + (size - 1));
-					size -= 1;
+					_mhandle.destroy(_first_element + (_size - 1));
+					_size -= 1;
 					return (this->end());
 				}
 			}
@@ -350,38 +412,70 @@ namespace ft {
 				size_type diff = iteratorDifference(first, last);
 				pointer		lastOne = this->end().getLocation() - 1;
 				for (iterator first_cpy = first;first_cpy != last; first_cpy++) {
-					mhandle.destroy(first_cpy.getLocation());
+					_mhandle.destroy(first_cpy.getLocation());
 					if ((first_cpy.getLocation() + diff) < lastOne)
-						mhandle.construct(first.getLocation(), *(first_cpy.getLocation() + diff));
+						_mhandle.construct(first.getLocation(), *(first_cpy.getLocation() + diff));
 				}
-				this->size -= diff;
+				this->_size -= diff;
 				return (first);
 			}
 
 
 			iterator		begin( void ) {
-				return iterator(first_element);
+				return (iterator(_first_element));
+			}
+			const_iterator	begin() const {
+				return (const_iterator(_first_element));
 			}
 
 			iterator		end( void ) {
-				return (iterator(first_element + size));
+				return (iterator(_first_element + _size));
+			}
+
+			const_iterator		end( void ) const {
+				return (const_iterator(_first_element + _size));
 			}
 
 			reverse_iterator		rbegin( void ) {
-				return reverse_iterator(first_element + size);
+				return (reverse_iterator(_first_element + _size));
+			}
+
+			const_reverse_iterator	rbegin() const {
+				return (const_reverse_iterator(_first_element + _size));
 			}
 
 			reverse_iterator		rend( void ) {
-				return (reverse_iterator(first_element));
+				return (reverse_iterator(_first_element));
 			}
+
+			const_reverse_iterator	rend() const {
+				return (const_reverse_iterator(_first_element));
+			}
+
+			const_iterator cbegin() const /*noexcept*/ {
+				return (const_iterator(_first_element));
+			}
+
+			const_iterator cend() const /*noexcept*/ {
+				return (const_iterator(_first_element + _size));
+			}
+
+			const_reverse_iterator crbegin() const /*noexcept*/ {
+				return (const_reverse_iterator(_first_element + _size));
+			}
+
+			const_reverse_iterator crend() const /*noexcept*/ {
+				return (const_reverse_iterator(_first_element));
+			}
+
 			/*  --------------  print function for debbug  -------------  */
 
 			void	print(void) {
-				std::cout << "size : " << size << BN;
-				std::cout << "capacity : " << capacity << BN;
+				std::cout << "_size : " << _size << BN;
+				std::cout << "_capacity : " << _capacity << BN;
 				std::cout << "what is inside my vector : " << BN;
-				for (size_type i = 0; i < size; i++)
-					std::cout << first_element[i] << " ";
+				for (size_type i = 0; i < _size; i++)
+					std::cout << _first_element[i] << " ";
 				std::cout << BN;
 			}
 
@@ -395,65 +489,65 @@ namespace ft {
 				return (i);
 			}
 
-			size_type	_increase_capacity(size_type evaluated_size, size_type capacity_tmp) {
-				if (capacity_tmp < evaluated_size && capacity_tmp)
-					return (_increase_capacity(evaluated_size, capacity_tmp * 2));
-				if (capacity_tmp == 0)
-					return (_increase_capacity(evaluated_size, (capacity_tmp + 2) * 2));
-				if ( capacity_tmp >= evaluated_size)
-					return (capacity_tmp);
-				return (capacity_tmp);
+			size_type	_increase_capacity(size_type evaluated_size, size_type _capacity_tmp) {
+				if (_capacity_tmp < evaluated_size && _capacity_tmp)
+					return (_increase_capacity(evaluated_size, _capacity_tmp * 2));
+				if (_capacity_tmp == 0)
+					return (_increase_capacity(evaluated_size, (_capacity_tmp + 2) * 2));
+				if ( _capacity_tmp >= evaluated_size)
+					return (_capacity_tmp);
+				return (_capacity_tmp);
 			}
 
 			pointer		_allocNewTab(size_type new_capacity) {
-				return (mhandle.allocate(new_capacity));
+				return (_mhandle.allocate(new_capacity));
 			}
 
 			void	_copyTab(pointer dest) {
-				for (size_type i = 0; i < size; i++)
-					mhandle.construct(dest + i, first_element[i]);
+				for (size_type i = 0; i < _size; i++)
+					_mhandle.construct(dest + i, _first_element[i]);
 			}
 			void	_cleanOldTab(void) {
-				for (size_type i = 0; i < size; i++)
-					mhandle.destroy(first_element + i);
-				mhandle.deallocate(first_element, size);
+				for (size_type i = 0; i < _size; i++)
+					_mhandle.destroy(_first_element + i);
+				_mhandle.deallocate(_first_element, _size);
 			}
 			void	_swapTab(pointer newTab) {
 				_copyTab(newTab);
 				_cleanOldTab();
-				this->first_element = newTab;
+				this->_first_element = newTab;
 			}
 
 			void	_shiftRight(pointer tab, size_type position, size_type offset) {
 				pointer tab_tmp;
-				for (tab_tmp = tab + (this->size - (1 + position)); tab_tmp != tab; tab_tmp--)
+				for (tab_tmp = tab + (this->_size - (1 + position)); tab_tmp != tab; tab_tmp--)
 				{
-					mhandle.construct(tab_tmp + offset, *tab_tmp);
-					mhandle.destroy(tab_tmp);
+					_mhandle.construct(tab_tmp + offset, *tab_tmp);
+					_mhandle.destroy(tab_tmp);
 				}
-					mhandle.construct(tab_tmp + offset, *tab_tmp);
-					mhandle.destroy(tab_tmp);
+					_mhandle.construct(tab_tmp + offset, *tab_tmp);
+					_mhandle.destroy(tab_tmp);
 			}
 
 			void	_putValue(pointer tab, size_type n, const value_type& val) {
 				while (n--)
-					mhandle.construct(tab++, val);
+					_mhandle.construct(tab++, val);
 			}
 
 			void	_insertVal(const value_type& val, size_type n, size_type position){
-				if (this->size != 0 && (first_element + position != first_element + this->size))
-					_shiftRight(first_element + position, position, n);
-				_putValue(first_element + position, n, val);
+				if (this->_size != 0 && (_first_element + position != _first_element + this->_size))
+					_shiftRight(_first_element + position, position, n);
+				_putValue(_first_element + position, n, val);
 			}
 
 
 			/*  -------------  private attributes  -------------  */
 			private :
 
-			size_type		size;
-			size_type		capacity;
-			pointer 		first_element;
-			allocator_type	mhandle;
+			size_type		_size;
+			size_type		_capacity;
+			pointer 		_first_element;
+			allocator_type	_mhandle;
 
 	};
 

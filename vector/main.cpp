@@ -143,49 +143,62 @@ int main( void )
 	// 	}
 	// }
 
+	// {
+		// std::cout << BN << "*********** REVERSE_ITERATORS TESTS ************" << BN;
+		// std::vector<int>	v;
+		// ft::vector<int>		v_bis;
+		// int t[10] = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+		// v.insert(v.begin(), t, t + 10);
+		// v_bis.insert(v_bis.begin(), t, t + 10);
 
-	{
-		std::cout << BN << "*********** REVERSE_ITERATORS TESTS ************" << BN;
-		std::vector<int>	v;
-		ft::vector<int>		v_bis;
-		int t[10] = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-		v.insert(v.begin(), t, t + 10);
-		v_bis.insert(v_bis.begin(), t, t + 10);
-
-		std::cout << "v -->  ";
-		for (int i = 0; i < 10; i++)
-			std::cout << v[i] << " ";
-		std::cout << BN << "v_bis -->  ";
-		for (int i = 0; i < 10; i++)
-			std::cout << v_bis[i] << " ";
-		std::cout << BN;
-		std::cout << BN;
-		std::cout << "v.rend() : " << *(v.rend().base()) << "\n";
-		std::cout << "v.rbegin() : " << *(v.rbegin().base() - 1) << "\n";
-		std::cout << "v_bis.rend() : " << *(v_bis.rend().base()) << "\n";
-		std::cout << "v_bis.rbegin() : " << *(v_bis.rbegin().base() - 1) << "\n";
-
-
-		std::cout << std::endl;
-		std::cout << "testing reverse iterator from reverse iterator : " << "\n\n";
-		typedef std::vector<int>::iterator	iter_type;
-		typedef ft::vector<int>::iterator	ft_iter_type;
+		// std::cout << "v -->  ";
+		// for (int i = 0; i < 10; i++)
+			// std::cout << v[i] << " ";
+		// std::cout << BN << "v_bis -->  ";
+		// for (int i = 0; i < 10; i++)
+			// std::cout << v_bis[i] << " ";
+		// std::cout << BN;
+		// std::cout << BN;
+		// std::cout << "v.rend() : " << *(v.rend().base()) << "\n";
+		// std::cout << "v.rbegin() : " << *(v.rbegin().base() - 1) << "\n";
+		// std::cout << "v_bis.rend() : " << *(v_bis.rend().base()) << "\n";
+		// std::cout << "v_bis.rbegin() : " << *(v_bis.rbegin().base() - 1) << "\n";
 
 
-		std::reverse_iterator<iter_type> test(v.end());
-		ft::reverse_iterator<ft_iter_type> test_bis(v_bis.end());
-		std::cout << "test : " << *test << std::endl;
-		std::cout << "test_bis : " << *test << std::endl;
+		// std::cout << std::endl;
+		// std::cout << "testing reverse iterator from reverse iterator : " << "\n\n";
+		// typedef std::vector<int>::iterator	iter_type;
+		// typedef ft::vector<int>::iterator	ft_iter_type;
 
-		//test = v.rend() + 4;
-		//std::cout << *test << " v.rend() + 4\n";
-		test_bis = v_bis.rend() + 4;
-		std::cout << *test_bis << " v_bis.rend() + 4\n";
 
-		std::cout << "\n\n******FIN DU TEST******\n";
-	}
-	return (0);
-}
+		// std::reverse_iterator<iter_type> test;
+		// ft::reverse_iterator<ft_iter_type> test_bis;
+
+		// std::cout << BN << "--> My vector:\n";
+
+		// test_bis = v_bis.rbegin();
+		// std::cout << "test_bis[i] :\n";
+		// for (size_t i = 0; i < 10; i++)
+			// std::cout << test_bis[i] << " ";
+		// std::cout << BN;
+		// std::cout << "*test_bis++ :\n";
+		// for (; test_bis != v_bis.rend();)
+			// std::cout << *test_bis++ << " ";
+
+		// std::cout << BN << "--> the real vector :\n";
+		// test = v.rbegin();
+		// std::cout << "test[i] :\n";
+		// for (size_t i = 0; i < 10; i++)
+			// std::cout << test[i] << " ";
+		// std::cout << BN;
+		// std::cout << "*test++ :\n";
+		// for (; test != v.rend();)
+			// std::cout << *test++ << " ";
+
+		// std::cout << "\n\n******FIN DU TEST******\n";
+	// }
+	// return (0);
+// }
 
 
 // int main (void) {
@@ -201,6 +214,69 @@ int main( void )
 // 	std::cout << "ici mon test : " << test[2] << "\n";
 // 	std::cout << "\n";
 
+{
+	std::cout << "TESTING _capacity FUNCTIONS : " << BN << BN;
+		std::vector<int>	v;
+		ft::vector<int>		v_bis;
+		int t[10] = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+		v.insert(v.begin(), t, t + 10);
+		v_bis.insert(v_bis.begin(), t, t + 10);
 
-// 	return (0);
-// }
+		std::cout << "v - v_bis" << BN;
+		for (size_t i = 0; i < 10; i++)
+			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
+		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
+		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
+
+		std::cout << "\n\n\nNow testing the resize function with smaller size (5) : \n";
+		v.resize(5);
+		v_bis.resize(5);
+		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
+		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
+		std::cout << "v - v_bis" << BN;
+		for (size_t i = 0; i < v_bis.size(); i++)
+			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
+		std::cout << "\n\n\nNow testing the resize function with greater size (10) with init at 42 : \n";
+		v.resize(10, 42);
+		v_bis.resize(10, 42);
+		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
+		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
+		std::cout << "v - v_bis" << BN;
+		for (size_t i = 0; i < v_bis.size(); i++)
+			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
+
+		std::cout << "\n\n///////////////////////////////////\n\n";
+		v_bis.print();
+		std::cout << "\n\n/////////////////\n\n";
+
+		std::cout << "\n\n\nNow testing the resize function with greater size AND beyond capacity (40) with init at 42 : \n";
+		v.resize(40, 42);
+		v_bis.resize(40, 42);
+		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
+		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
+		std::cout << "v - v_bis" << BN;
+		for (size_t i = 0; i < v_bis.size(); i++)
+			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
+
+		/* LE VECTOR OFFICIEL JETTE UNE ERREUR TANDIS QUE TOI TU SEGFAULT 
+		std::cout << "\n\n\nNow testing the resize function with fucked up things : \n";
+		v.resize(-5, 42);
+		v_bis.resize(-5, 42);
+		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
+		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
+		std::cout << "v - v_bis" << BN;
+		for (size_t i = 0; i < v_bis.size(); i++)
+			std::cout << " " << v[i] << " - " << v_bis[i] << BN;*/
+
+
+
+
+
+
+
+
+
+}
+
+ 	return (0);
+}
