@@ -302,18 +302,20 @@ namespace ft {
 					i++;
 				}
 			}
+			vector (const vector& x) : _size(0), _capacity(0), _first_element(NULL), _mhandle(x.get_allocator()){
+				*this = x;
+			}
 
-			vector& operator= (const vector& x) {
-				this->_mhandle = x.get_allocator();
+			const vector&	operator= (const vector& x){
+				this->reserve(x.capacity());
 				this->assign(x.begin(), x.end());
 				return (*this);
 			}
 
 			~vector(){
-				for (size_type tmp = this->_size; tmp < this->_size; tmp++)
-					_mhandle.destroy(_first_element + tmp);
-				_mhandle.deallocate(_first_element, this->_capacity);
-
+					for (size_type tmp = this->_size; tmp < this->_size; tmp++)
+						_mhandle.destroy(_first_element + tmp);
+					_mhandle.deallocate(_first_element, this->_capacity);
 			}
 
 			/*  -----------  Overload function    -------------*/
@@ -342,6 +344,8 @@ namespace ft {
 			}
 
 			void		resize (size_type new_size, value_type val = value_type()) {
+				if (new_size >= this->max_size() || new_size < 0)
+					throw std::out_of_range("ERREUR: Une erreur a ete detecte entre la chaise et le clavier !");
 				if (new_size < this->_size)
 					erase(iterator(_first_element + (new_size - 1)), iterator(end()));
 				else if (new_size > this->_size)
@@ -544,7 +548,7 @@ namespace ft {
 			/*  -----------------------  Other  --------------------------*/
 
 			allocator_type get_allocator() const {
-				return (this->mhandle);
+				return (this->_mhandle);
 			}
 
 			/*  --------------  print function for debbug  -------------  */

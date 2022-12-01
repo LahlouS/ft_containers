@@ -5,28 +5,29 @@
 
 int main(void){
 	std::vector<int> v;
+
+	std::vector<int> v2;
+
 	int t[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	int f[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 98};
 	v.insert(v.begin(), t, t + 10);
+	v2.insert(v2.begin(), f, f + 10);
 
 	for (int i = 0; i < 10; i++)
 		std::cout << v[i] << " ";
 	std::cout << BN;
+
+
+	for (int i = 0; i < 10; i++)
+		std::cout << v2[i] << " ";
 	std::cout << BN;
 
-	v.insert(v.begin(), t + 2, t + 4);
+	v = v2;
 
-	for (size_t i = 0; i < v.size(); i++)
+	for (int i = 0; i < 10; i++)
 		std::cout << v[i] << " ";
 	std::cout << BN;
-	std::cout << BN;
 
-	v.assign(5, 42);
-	for (size_t i = 0; i < v.size(); i++)
-		std::cout << v[i] << " ";
-	std::cout << BN;
-	std::cout << BN;
-
-	v.emplace(v.begin(), 12);
 	return (0);
 }
 

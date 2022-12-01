@@ -258,15 +258,19 @@ int main( void )
 // 		for (size_t i = 0; i < v_bis.size(); i++)
 // 			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
 
-// 		/* LE VECTOR OFFICIEL JETTE UNE ERREUR TANDIS QUE TOI TU SEGFAULT
 // 		std::cout << "\n\n\nNow testing the resize function with fucked up things : \n";
-// 		v.resize(-5, 42);
-// 		v_bis.resize(-5, 42);
+// 		try {
+// 			//v.resize(-5, 42);
+// 			v_bis.resize(-5, 42);
+// 		} catch (std::exception & e) {
+// 			std::cout << e.what();
+// 		}
+
 // 		std::cout << "\nSIZE() --> size v : " << v.size() << "size v_bis : " << v_bis.size() << BN;
 // 		std::cout << "\nMAX_SIZE() --> max_size v : " << v.max_size() << "max_size v_bis : " << v_bis.max_size() << BN;
 // 		std::cout << "v - v_bis" << BN;
 // 		for (size_t i = 0; i < v_bis.size(); i++)
-// 			std::cout << " " << v[i] << " - " << v_bis[i] << BN;*/
+// 			std::cout << " " << v[i] << " - " << v_bis[i] << BN;
 
 // 	}
 
@@ -307,20 +311,32 @@ int main( void )
 
 	// 	std::cout << BN;
 	// }
+	// {
+	// 	std::cout << "****  TESTING ACESS ELEMENTS  ****" << BN << BN;
+	// 		std::vector<int>	v(5);
+	// 		ft::vector<int>		v_bis(5);
+
+	// 		try {
+	// 			std::cout << "normal utilisation :" << v.at(0) << " " << v_bis.at(0) << BN;
+	// 			//v.at(12);
+	// 		} catch (std::exception const & e) {
+	// 			std::cout << e.what();
+	// 		}
+	// 	std::cout << "v.capacity() : " << v.capacity() << BN;
+	// 	std::cout << "v_bis.capacity() : " << v_bis.capacity() << BN;
+	// }
+
 	{
-		std::cout << "****  TESTING ACESS ELEMENTS  ****" << BN << BN;
-			std::vector<int>	v(5);
-			ft::vector<int>		v_bis(5);
+		std::cout << "****  TESTING =OPERATOR ****" << BN << BN;
+		char c[] = {78, 89, 45, 56, 12, 23};
 
-			try {
-				std::cout << "normal utilisation :" << v.at(0) << " " << v_bis.at(0) << BN;
-				//v.at(12);
-			} catch (std::exception const & e) {
-				std::cout << e.what();
-			}
-		std::cout << "v.capacity() : " << v.capacity() << BN;
-		std::cout << "v_bis.capacity() : " << v_bis.capacity() << BN;
+		ft::vector<int>	test(c, c + 6);
+		ft::vector<int> myvector = test;
+		std::cout << "AUCUN PB\n\n";
+
+		std::cout << BN << BN;
+		test.print();
+		myvector.print();
 	}
-
  	return (0);
 }
