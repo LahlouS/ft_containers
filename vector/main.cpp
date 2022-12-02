@@ -326,17 +326,148 @@ int main( void )
 	// 	std::cout << "v_bis.capacity() : " << v_bis.capacity() << BN;
 	// }
 
+	// {
+	// 	std::cout << "****  TESTING =OPERATOR ****" << BN << BN;
+	// 	char c[] = {78, 89, 45, 56, 12, 23};
+
+	// 	ft::vector<int>	test(c, c + 6);
+	// 	ft::vector<int> myvector = test;
+	// 	std::cout << "AUCUN PB\n\n";
+
+	// 	std::cout << BN << BN;
+	// 	test.print();
+	// 	myvector.print();
+	// }
+
+	// {
+	// 	std::cout << "********  TESTING ACCESS ELEMENTS ************" << BN << BN;
+
+	// 	std::string strs[3];
+
+	// 	strs[0] = "test";
+	// 	strs[1] = "test1";
+	// 	strs[2] = "test2";
+
+	// 	std::vector<std::string>	v(strs, strs + 3);
+	// 	ft::vector<std::string>	vbis(strs, strs + 3);
+
+	// 	std::cout << "     v  --  vbis\n";
+	// 	for (size_t i = 0; i < vbis.size(); i++)
+	// 		std::cout << "   " << v[i] << " - " << vbis[i] << BN;
+	// 	std::cout << BN;
+	// 	std::cout << "testing front() function :" << BN;
+	// 	std::cout << "v.front() : " << v.front() << BN;
+	// 	std::cout << "vbis.front() : " << vbis.front() << BN << BN;
+
+	// 	std::cout << "testing back() function :" << BN;
+	// 	std::cout << "v.back() : " << v.back() << BN;
+	// 	std::cout << "vbis.back() : " << vbis.back() << BN << BN;
+
+	// 	std::cout << "testing data() function :" << BN;
+	// 	std::cout << "v.data() : " << v.data() << BN;
+	// 	std::cout << "vbis.data() : " << vbis.data() << BN;
+
+	// 	std::cout << "\n\n********  FIN DU TEST ************" << BN << BN;
+
+	// 	std::cout << "********  TESTING MODIFIERS ELEMENTS ************" << BN << BN;
+
+	// 	std::cout << "testing push_back() function :" << BN;
+	// 	v.push_back("NOUVELLE STR");
+	// 	vbis.push_back("NOUVELLE STR");
+	// 	std::cout << "v.back()    (after push_back(\"NOUVELLE STR\")): " << v.back() << BN;
+	// 	std::cout << "vbis.back() (after push_back(\"NOUVELLE STR\")): " << vbis.back() << BN << BN;
+
+	// 	std::cout << "testing pop_back() function :" << BN;
+	// 	v.pop_back();
+	// 	vbis.pop_back();
+	// 	std::cout << "v.back()    (after pop_back): " << v.back() << BN;
+	// 	std::cout << "vbis.back() (after pop_back): " << vbis.back() << BN << BN;
+	// 	v.pop_back();
+	// 	v.pop_back();
+	// 	v.pop_back();
+	// 	vbis.pop_back();
+	// 	vbis.pop_back();
+	// 	vbis.pop_back();
+	// 	std::cout << "testing size after pop_back() everything : \nv ->" << v.size() << BN << "vbis->" << vbis.size() << BN << BN;
+	// 	v.assign(5, "original");
+	// 	vbis.assign(5, "original");
+	// 	std::cout << "testing swap() function :" << BN;
+	// 	std::vector<std::string> v2(5, "swap");
+	// 	ft::vector<std::string> vbis2(5, "swap");
+
+	// 	v.swap(v2);
+	// 	vbis.swap(vbis2);
+
+	// 	std::cout << "testing swap() and assign function : " << BN;
+	// 	std::cout << "v[i]" << " | " << "vbis[i]" << BN;
+	// 	for (size_t i = 0; i < vbis.size(); i++){
+	// 		std::cout << v[i] << " " << vbis[i] << BN;
+	// 	}
+	// 	std::cout << BN << "v2[i]" << " | " << "vbis2[i]" << BN;
+	// 	for (size_t i = 0; i < vbis2.size(); i++){
+	// 		std::cout << v2[i] << " " << vbis2[i] << BN;
+	// 	}
+
+	// 	std::cout << "\n\n******FIN DU TEST******\n";
+	// 	v.clear();
+	// 	v2.clear();
+	// 	vbis.clear();
+	// 	vbis2.clear();
+
+	// 	std::cout << "size after all cleared : " << (v.size() + v2.size() + vbis.size() + vbis2.size()) << BN;
+
+	// }
+
 	{
-		std::cout << "****  TESTING =OPERATOR ****" << BN << BN;
-		char c[] = {78, 89, 45, 56, 12, 23};
+		std::cout << "***  TESTING VECTOR RELATIONAL OPERATOR   ***" << BN << BN;
 
-		ft::vector<int>	test(c, c + 6);
-		ft::vector<int> myvector = test;
-		std::cout << "AUCUN PB\n\n";
+		ft::vector<int> v;
+		ft::vector<int> v2;
 
-		std::cout << BN << BN;
-		test.print();
-		myvector.print();
+		int t[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+		int f[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 10};
+		v.insert(v.begin(), t, t + 10);
+		v2.insert(v2.begin(), f, f + 10);
+
+		std::cout << "v" << "  " << "v2" << BN;
+		std::cout << "--" << "  " << "--" << BN;
+		for (int i = 0; i < 10; i++)
+			std::cout << v[i] << "  " << v2[i] << BN;
+		std::cout << BN;
+
+		if (v < v2)
+			std::cout << "v < v2 : true\n";
+		else
+			std::cout << "v < v2 : false\n";
+
+		if (v > v2)
+			std::cout << "v > v2 : true\n";
+		else
+			std::cout << "v > v2 : false\n";
+
+		if (v == v2)
+			std::cout << "v == v2 : true\n";
+		else
+			std::cout << "v == v2 : false\n";
+
+		if (v != v2)
+			std::cout << "v != v2 : true\n";
+		else
+			std::cout << "v != v2 : false\n";
+
+		if (v <= v2)
+			std::cout << "v <= v2 : true\n";
+		else
+			std::cout << "v <= v2 : false\n";
+
+		if (v >= v2)
+			std::cout << "v >= v2 : true\n";
+		else
+			std::cout << "v >= v2 : false\n";
+
+		std::cout << std::boolalpha << ft::lexicographical_compare(v.begin(), v.end(), v2.begin(), v2.end());
+		std::cout << "**********  FIN DU TEST  *******************" << BN << BN;
+
 	}
  	return (0);
 }

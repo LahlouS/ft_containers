@@ -483,7 +483,7 @@ namespace ft {
 			}
 
 			void pop_back(void) {
-				this->erase(this->end());
+				this->erase(this->end() - 1);
 			}
 
 			void swap (vector& x) {
@@ -633,6 +633,56 @@ namespace ft {
 			allocator_type	_mhandle;
 
 	};
+
+	template <class T, class Alloc>
+	bool operator==(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs){
+		typedef typename vector<T, Alloc>::const_iterator iterator;
+
+		return (!(ft::lexicographical_compare<iterator, iterator>(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend()))
+			&& !(ft::lexicographical_compare<iterator, iterator>(rhs.cbegin(), rhs.cend(), lhs.cbegin(), lhs.cend())));
+	}
+
+	template <class T, class Alloc>
+	bool operator!=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs){
+		typedef typename vector<T, Alloc>::const_iterator iterator;
+
+		if ((ft::lexicographical_compare<iterator, iterator>(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend()))
+			|| (ft::lexicographical_compare<iterator, iterator>(rhs.cbegin(), rhs.cend(), lhs.cbegin(), lhs.cend())))
+			return (true);
+		return (false);
+	}
+
+	template <class T, class Alloc>
+	bool operator<(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs){
+		typedef typename vector<T, Alloc>::const_iterator iterator;
+
+		if ((ft::lexicographical_compare<iterator, iterator>(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend())))
+			return (true);
+		return (false);
+	}
+
+	template <class T, class Alloc>
+	bool operator<=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs){
+		typedef typename vector<T, Alloc>::const_iterator iterator;
+
+		if (((ft::lexicographical_compare<iterator, iterator>(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend()))) || lhs == rhs)
+			return (true);
+		return (false);
+	}
+
+	template <class T, class Alloc>
+	bool operator>(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs){
+		if (!(lhs <= rhs))
+			return (true);
+		return (false);
+	}
+
+	template <class T, class Alloc>
+	bool operator>=(const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs){
+		if (!(lhs < rhs) || (lhs == rhs))
+			return (true);
+		return (false);
+	}
 
 }
 
