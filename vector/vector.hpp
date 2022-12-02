@@ -152,12 +152,15 @@ namespace ft {
 		standard_tab_iterator(pointer start_addr) {
 			_location = start_addr;
 		}
-		standard_tab_iterator(standard_tab_iterator<T> const & itToCopy) {
+
+		// template <typename U>
+		standard_tab_iterator(const standard_tab_iterator<typename remove_cv<value_type>::type > & itToCopy) {
 			*this = itToCopy;
 		}
 
-		standard_tab_iterator<T> const & operator=(standard_tab_iterator<T> const & itToAssign) {
-			this->_location = itToAssign._location;
+		// template <typename U>
+		standard_tab_iterator const & operator=(standard_tab_iterator<typename remove_cv<value_type>::type> const & itToAssign) {
+			this->_location = itToAssign.operator->();
 			return (*this);
 		}
 
@@ -166,36 +169,36 @@ namespace ft {
 		/* ---------- Operators overloads ---------- */
 		/*  -----------  ++ ++ && -- -- -----------  */
 
-		standard_tab_iterator<T> const & operator++( void ){
+		standard_tab_iterator const & operator++( void ){
 			_location++;
 			return (*this);
 		}
 
-		standard_tab_iterator<T>	operator++( int ) {
-			standard_tab_iterator<T>	temp = *this;
+		standard_tab_iterator	operator++( int ) {
+			standard_tab_iterator	temp = *this;
 			_location++;
 			return (temp);
 		}
 
-		standard_tab_iterator<T> const & operator--( void ){
+		standard_tab_iterator const & operator--( void ){
 			_location--;
 			return (*this);
 		}
 
-		standard_tab_iterator<T>	operator--( int ) {
-			standard_tab_iterator<T>	temp = *this;
+		standard_tab_iterator	operator--( int ) {
+			standard_tab_iterator	temp = *this;
 			_location--;
 			return (temp);
 		}
 		/*  -----------  == && != -----------  */
 
-		bool		operator==(standard_tab_iterator<T> const & itToComp) {
+		bool		operator==(standard_tab_iterator const & itToComp) {
 			if (_location == itToComp._location)
 				return (true);
 			return (false);
 		}
 
-		bool		operator!=(standard_tab_iterator<T> const & itToComp) {
+		bool		operator!=(standard_tab_iterator const & itToComp) {
 			if (_location != itToComp._location)
 				return (true);
 			return (false);
@@ -208,42 +211,42 @@ namespace ft {
 		}
 
 		pointer	operator->( void ) const {
-			return (*_location);
+			return (_location);
 		};
 
 		/*  -----------  + && - -----------  */
 
-		standard_tab_iterator<value_type>	operator+(difference_type const & toAdd) {
-			return (standard_tab_iterator<value_type>(this->_location + toAdd));
+		standard_tab_iterator	operator+(difference_type const & toAdd) {
+			return (standard_tab_iterator(this->_location + toAdd));
 		}
 
-		standard_tab_iterator<value_type>	operator-(difference_type const & toAdd) {
-			return (standard_tab_iterator<value_type>(this->_location - toAdd));
+		standard_tab_iterator	operator-(difference_type const & toAdd) {
+			return (standard_tab_iterator(this->_location - toAdd));
 		}
 
-		standard_tab_iterator<value_type>	operator+(difference_type const & toAdd) const {
-			return (standard_tab_iterator<value_type>(this->_location + toAdd));
+		standard_tab_iterator	operator+(difference_type const & toAdd) const {
+			return (standard_tab_iterator(this->_location + toAdd));
 		}
 
-		standard_tab_iterator<value_type>	operator-(difference_type const & toAdd) const {
-			return (standard_tab_iterator<value_type>(this->_location - toAdd));
+		standard_tab_iterator	operator-(difference_type const & toAdd) const {
+			return (standard_tab_iterator(this->_location - toAdd));
 		}
 
-		difference_type	operator+(standard_tab_iterator<value_type> const & toAdd) {
+		difference_type	operator+(standard_tab_iterator const & toAdd) {
 			return (this->_location + toAdd._location);
 		}
 
-		difference_type	operator-(standard_tab_iterator<value_type> const & toAdd) {
+		difference_type	operator-(standard_tab_iterator const & toAdd) {
 			return (this->_location - toAdd._location);
 		}
 		/*  -----------  += && -=  -----------  */
 
-		standard_tab_iterator<T> const & operator+=(difference_type const & toAddAssign) {
+		standard_tab_iterator const & operator+=(difference_type const & toAddAssign) {
 			this->_location += toAddAssign;
 			return (*this);
 		}
 
-		standard_tab_iterator<T> const & operator-=(difference_type const & toAddAssign) {
+		standard_tab_iterator const & operator-=(difference_type const & toAddAssign) {
 			this->_location -= toAddAssign;
 			return (*this);
 		}
@@ -251,6 +254,25 @@ namespace ft {
 		pointer	getLocation(void) {
 			return (_location);
 		}
+
+		/*  -----------  < <= && > >=  -----------  */
+
+		bool operator<(standard_tab_iterator const & toAdd) const {
+			return (_location < toAdd.operator->());
+		}
+
+		bool operator<=(standard_tab_iterator const & toAdd) const {
+			return (_location <= toAdd.operator->());
+		}
+
+		bool operator>(standard_tab_iterator const & toAdd) const {
+			return (_location > toAdd.operator->());
+		}
+
+		bool operator>=(standard_tab_iterator const & toAdd) const {
+			return (_location >= toAdd.operator->());
+		}
+
 		private :
 		/*  --------------  private attribute  ----------------  */
 		pointer	_location;
@@ -306,7 +328,7 @@ namespace ft {
 				*this = x;
 			}
 
-			const vector&	operator= (const vector& x){
+			vector&	operator= (const vector& x){
 				this->reserve(x.capacity());
 				this->assign(x.begin(), x.end());
 				return (*this);
@@ -437,7 +459,7 @@ namespace ft {
 			template <class InputIterator>
 			void insert (iterator position, InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, InputIterator>::type = NULL) {
 				while (first != last) {
-					insert(position, 1, *first);
+					position = (insert(position, 1, *first) + 1);
 					first++;
 				}
 			}
@@ -455,11 +477,12 @@ namespace ft {
 
 			iterator		erase(iterator first, iterator last) {
 				size_type diff = iteratorDifference(first, last);
-				pointer		lastOne = this->end().getLocation() - 1;
 				for (iterator first_cpy = first;first_cpy != last; first_cpy++) {
-					_mhandle.destroy(first_cpy.getLocation());
-					if ((first_cpy.getLocation() + diff) < lastOne)
-						_mhandle.construct(first.getLocation(), *(first_cpy.getLocation() + diff));
+					_mhandle.destroy(first_cpy.operator->());
+				}
+				for (; first != this->end() - diff; first++){
+					_mhandle.construct(first.operator->(), *(first.operator->() + diff));
+					_mhandle.destroy(first.operator->() + diff);
 				}
 				this->_size -= diff;
 				return (first);
@@ -568,7 +591,9 @@ namespace ft {
 
 			size_type _findPosition(iterator position) {
 				size_type i = 0;
-				for (iterator it = this->begin(); it != this->end() && it != position; it++, i++);
+				for (iterator it = this->begin(); it != this->end() && it != position; it++, i++){
+
+				}
 				return (i);
 			}
 
