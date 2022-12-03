@@ -6,6 +6,7 @@
 #include <memory>
 #include <exception>
 #include "traits_utils.hpp"
+#include <stdexcept>
 #define BN "\n"
 
 namespace ft {
@@ -239,6 +240,7 @@ namespace ft {
 		difference_type	operator-(standard_tab_iterator const & toAdd) {
 			return (this->_location - toAdd._location);
 		}
+
 		/*  -----------  += && -=  -----------  */
 
 		standard_tab_iterator const & operator+=(difference_type const & toAddAssign) {
@@ -255,7 +257,7 @@ namespace ft {
 			return (_location);
 		}
 
-		/*  -----------  < <= && > >=  -----------  */
+		/*  -----------  += && -=  -----------  */
 
 		bool operator<(standard_tab_iterator const & toAdd) const {
 			return (_location < toAdd.operator->());
@@ -302,11 +304,8 @@ namespace ft {
 			/*  -----------  Constructors definition  -----------  */
 			explicit vector(const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _first_element(NULL), _mhandle(alloc) {  /*  nothing to put for the moment  */  }
 
-			explicit vector(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _size(n), _capacity(n), _first_element(NULL), _mhandle(alloc) {
-				_first_element = _mhandle.allocate(_size);
-				while (--n)
-					_mhandle.construct(_first_element + n, val);
-				_mhandle.construct(_first_element + n, val);
+			explicit vector(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _size(0), _capacity(0), _first_element(NULL), _mhandle(alloc) {
+				this->insert(this->begin(), n, val);
 			}
 			template <class InputIterator>
 			vector(InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, InputIterator>::type = NULL, const allocator_type& alloc = allocator_type())
@@ -329,15 +328,14 @@ namespace ft {
 			}
 
 			vector&	operator= (const vector& x){
-				this->reserve(x.capacity());
+				this->reserve(x._size);
 				this->assign(x.begin(), x.end());
 				return (*this);
 			}
 
 			~vector(){
-					for (size_type tmp = this->_size; tmp < this->_size; tmp++)
-						_mhandle.destroy(_first_element + tmp);
-					_mhandle.deallocate(_first_element, this->_capacity);
+				this->clear();
+				_mhandle.deallocate(_first_element, this->_capacity);
 			}
 
 			/*  -----------  Overload function    -------------*/
@@ -368,10 +366,12 @@ namespace ft {
 			void		resize (size_type new_size, value_type val = value_type()) {
 				if (new_size >= this->max_size() || new_size < 0)
 					throw std::out_of_range("ERREUR: Une erreur a ete detecte entre la chaise et le clavier !");
-				if (new_size < this->_size)
-					erase(iterator(_first_element + (new_size - 1)), iterator(end()));
-				else if (new_size > this->_size)
+				if (new_size < this->_size && new_size != 0)
+					erase(iterator(_first_element + (new_size)), iterator(end()));
+				else if (new_size > this->_size && new_size != 0)
 					insert(end(), (new_size - this->_size), val);
+				else if (new_size == 0)
+					this->clear();
 				this->_size = new_size;
 			}
 
@@ -381,13 +381,16 @@ namespace ft {
 
 			void	reserve(size_type n, bool intern = 0) {
 				pointer		dest = NULL;
+				if (n > this->max_size())
+					throw std::length_error("vector::reserve");
 				if (n > this->_capacity || intern)
 				{
 					dest = _allocNewTab(n);
 					if (dest)
 						_swapTab(dest);
 				}
-				this->_capacity = n;
+				if (n > _capacity || intern)
+					this->_capacity = n;
 			}
 			// not in c++98 :/
 			void shrink_to_fit(void) {
@@ -445,7 +448,9 @@ namespace ft {
 				pointer		dest = NULL;
 				size_type	pos = _findPosition(position);
 
-				if (_capacity != (new_capacity = _increase_capacity(_size + n, _capacity)))
+				if (n == 0)
+					return (position);
+				if (_capacity != (new_capacity = _return_new_capacity(_size, _capacity, n)))
 					dest = _allocNewTab(new_capacity);
 				if (dest)
 					_swapTab(dest);
@@ -480,9 +485,9 @@ namespace ft {
 				for (iterator first_cpy = first;first_cpy != last; first_cpy++) {
 					_mhandle.destroy(first_cpy.operator->());
 				}
-				for (; first != this->end() - diff; first++){
-					_mhandle.construct(first.operator->(), *(first.operator->() + diff));
-					_mhandle.destroy(first.operator->() + diff);
+				for (iterator first_cpy = first; first_cpy != this->end() - (diff); first_cpy++){
+					_mhandle.construct(first_cpy.operator->(), *(first_cpy.operator->() + diff));
+					_mhandle.destroy(first_cpy.operator->() + diff);
 				}
 				this->_size -= diff;
 				return (first);
@@ -510,9 +515,20 @@ namespace ft {
 			}
 
 			void swap (vector& x) {
-				ft::vector<value_type> temp(this->begin(), this->end());
-				this->assign(x.begin(), x.end());
-				x.assign(temp.begin(), temp.end());
+				size_type		size_tmp = this->_size;
+				size_type		capacity_tmp = this->_capacity;
+				pointer 		first_element_tmp = this->_first_element;
+				allocator_type	mhandle_tmp = this->_mhandle;
+
+				this->_size = x._size;
+				this->_capacity = x._capacity;
+				this->_first_element = x._first_element;
+				this->_mhandle = x._mhandle;
+
+				x._size = size_tmp;
+				x._capacity = capacity_tmp;
+				x._first_element = first_element_tmp;
+				x._mhandle = mhandle_tmp;
 			}
 
 			void	clear(void) {
@@ -592,7 +608,6 @@ namespace ft {
 			size_type _findPosition(iterator position) {
 				size_type i = 0;
 				for (iterator it = this->begin(); it != this->end() && it != position; it++, i++){
-
 				}
 				return (i);
 			}
@@ -648,6 +663,25 @@ namespace ft {
 				_putValue(_first_element + position, n, val);
 			}
 
+			size_type _return_new_capacity(size_type size, size_type capacity, size_type elems)
+			{
+				if (size == capacity)
+				{
+					if (elems <= capacity)
+						return (capacity * 2);
+					else
+						return (capacity + elems);
+				}
+				else
+				{
+					if (size + elems <= capacity)
+						return (capacity);
+					if (size + elems <= size * 2)
+						return (size * 2);
+					else
+						return (size + elems);
+				};
+			}
 
 			/*  -------------  private attributes  -------------  */
 			private :
@@ -707,6 +741,11 @@ namespace ft {
 		if (!(lhs < rhs) || (lhs == rhs))
 			return (true);
 		return (false);
+	}
+
+	template <class T, class Alloc>
+	void	swap(vector<T,Alloc>& x, vector<T,Alloc>& y) {
+		x.swap(y);
 	}
 
 }
