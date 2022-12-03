@@ -60,14 +60,17 @@ namespace ft {
 	struct is_int<short int> {
 		static const bool value = true;
 	};
-		template<>
+
+	template<>
 	struct is_int<int> {
 		static const bool value = true;
 	};
+
 	template<>
 	struct is_int<long int> {
 		static const bool value = true;
 	};
+
 	template<>
 	struct is_int<long long int> {
 		static const bool value = true;
@@ -170,7 +173,7 @@ namespace ft {
 		/* ---------- Operators overloads ---------- */
 		/*  -----------  ++ ++ && -- -- -----------  */
 
-		standard_tab_iterator const & operator++( void ){
+		standard_tab_iterator & operator++( void ){
 			_location++;
 			return (*this);
 		}
@@ -181,7 +184,7 @@ namespace ft {
 			return (temp);
 		}
 
-		standard_tab_iterator const & operator--( void ){
+		standard_tab_iterator & operator--( void ){
 			_location--;
 			return (*this);
 		}
@@ -193,16 +196,16 @@ namespace ft {
 		}
 		/*  -----------  == && != -----------  */
 
-		bool		operator==(standard_tab_iterator const & itToComp) {
-			if (_location == itToComp._location)
+		template <typename U>
+		bool		operator==(standard_tab_iterator<U> const & itToComp) {
+			if (_location == itToComp.operator->())
 				return (true);
 			return (false);
 		}
 
-		bool		operator!=(standard_tab_iterator const & itToComp) {
-			if (_location != itToComp._location)
-				return (true);
-			return (false);
+		template <typename U>
+		bool		operator!=(standard_tab_iterator<U> const & itToComp) {
+			return (_location != itToComp.operator->());
 		}
 
 		/*  -----------  * && -> -----------  */
@@ -214,6 +217,14 @@ namespace ft {
 		pointer	operator->( void ) const {
 			return (_location);
 		};
+
+		reference operator[] (difference_type n) {
+			return (*(this->_location + n));
+		}
+
+		reference operator[] (difference_type n) const {
+			return (*(this->_location + n));
+		}
 
 		/*  -----------  + && - -----------  */
 
@@ -233,11 +244,11 @@ namespace ft {
 			return (standard_tab_iterator(this->_location - toAdd));
 		}
 
-		difference_type	operator+(standard_tab_iterator const & toAdd) {
+		difference_type	operator+(standard_tab_iterator const & toAdd) const {
 			return (this->_location + toAdd._location);
 		}
 
-		difference_type	operator-(standard_tab_iterator const & toAdd) {
+		difference_type	operator-(standard_tab_iterator const & toAdd) const {
 			return (this->_location - toAdd._location);
 		}
 
@@ -258,28 +269,35 @@ namespace ft {
 		}
 
 		/*  -----------  += && -=  -----------  */
-
-		bool operator<(standard_tab_iterator const & toAdd) const {
+		template < typename U >
+		bool operator<(standard_tab_iterator<U> const & toAdd) const {
 			return (_location < toAdd.operator->());
 		}
 
-		bool operator<=(standard_tab_iterator const & toAdd) const {
+		template < typename U >
+		bool operator<=(standard_tab_iterator<U> const & toAdd) const {
 			return (_location <= toAdd.operator->());
 		}
 
-		bool operator>(standard_tab_iterator const & toAdd) const {
+		template < typename U >
+		bool operator>(standard_tab_iterator<U> const & toAdd) const {
 			return (_location > toAdd.operator->());
 		}
 
-		bool operator>=(standard_tab_iterator const & toAdd) const {
+		template < typename U >
+		bool operator>=(standard_tab_iterator<U> const & toAdd) const {
 			return (_location >= toAdd.operator->());
 		}
 
 		private :
 		/*  --------------  private attribute  ----------------  */
 		pointer	_location;
-
 	};
+
+	template <typename T>
+	standard_tab_iterator<T> operator+(typename standard_tab_iterator<T>::difference_type n, standard_tab_iterator<T> const & rhs) {
+		return (rhs + n);
+	}
 
 
 
@@ -308,8 +326,9 @@ namespace ft {
 				this->insert(this->begin(), n, val);
 			}
 			template <class InputIterator>
-			vector(InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, InputIterator>::type = NULL, const allocator_type& alloc = allocator_type())
+			vector(InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, int>::type test = 0, const allocator_type& alloc = allocator_type())
 			: _size(0), _capacity(0), _first_element(NULL), _mhandle(alloc) {
+				(void) test;
 				this->_mhandle = alloc;
 				InputIterator temp = first;
 				size_t	i = 0;
@@ -462,7 +481,7 @@ namespace ft {
 
 
 			template <class InputIterator>
-			void insert (iterator position, InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, InputIterator>::type = NULL) {
+			void insert (iterator position, InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, int>::type = 0) {
 				while (first != last) {
 					position = (insert(position, 1, *first) + 1);
 					first++;
