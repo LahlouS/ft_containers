@@ -11,135 +11,6 @@
 
 namespace ft {
 
-
-
-	/*---------------  remove_cv  -----------------*/
-	template< class T > struct remove_cv                   { typedef T type; };
-	template< class T > struct remove_cv<const T>          { typedef T type; };
-	template< class T > struct remove_cv<volatile T>       { typedef T type; };
-	template< class T > struct remove_cv<const volatile T> { typedef T type; };
-
-	template< class T > struct remove_const                { typedef T type; };
-	template< class T > struct remove_const<const T>       { typedef T type; };
-
-	template< class T > struct remove_volatile             { typedef T type; };
-	template< class T > struct remove_volatile<volatile T> { typedef T type; };
-
-
-	/*---------------  Enable_if  -----------------*/
-	template<bool condition, typename T>
-	struct enable_if { /* no type defined SFINAE will do the job*/ };
-
-	template <typename T>
-	struct enable_if<true, T> { typedef T type; /*  "returning a type meaning there is a match "*/ };
-
-	/*---------------  Is_Integral  -----------------*/
-
-	template<typename T>
-	struct is_int {
-		static const bool value = false;
-	};
-
-	template<>
-	struct is_int<bool> {
-		static const bool value = true;
-	};
-	template<>
-	struct is_int<char> {
-		static const bool value = true;
-	};
-	template<>
-	struct is_int<wchar_t> {
-		static const bool value = true;
-	};
-	template<>
-	struct is_int<signed char> {
-		static const bool value = true;
-	};
-	template<>
-	struct is_int<short int> {
-		static const bool value = true;
-	};
-
-	template<>
-	struct is_int<int> {
-		static const bool value = true;
-	};
-
-	template<>
-	struct is_int<long int> {
-		static const bool value = true;
-	};
-
-	template<>
-	struct is_int<long long int> {
-		static const bool value = true;
-	};
-	template<>
-	struct is_int<unsigned char> {
-		static const bool value = true;
-	};
-	template<>
-	struct is_int<unsigned short int> {
-		static const bool value = true;
-	};
-	template<>
-	struct is_int<unsigned int> {
-		static const bool value = true;
-	};
-	template<>
-	struct is_int<unsigned long int> {
-		static const bool value = true;
-	};
-	template<>
-	struct is_int<unsigned long long int> {
-		static const bool value = true;
-	};
-
-	template<typename T>
-	struct is_integral {
-		static const bool value = is_int<typename remove_cv<T>::type >::value;
-	};
-
-
-
-
-	/*--------------  Iterator_difference  ---------*/
-	template <typename T_iterator>
-	typename ft::iterator_traits<T_iterator>::difference_type	iteratorDifference(T_iterator first, T_iterator last) {
-		return (compute_diffence(first, last, typename ft::iterator_traits<T_iterator>::iterator_category()));
-	}
-
-	template <typename T_iterator>
-	typename ft::iterator_traits<T_iterator>::difference			iteratorDifference(T_iterator first, T_iterator last) {
-		return (last - first);
-	}
-
-	template <typename T_iterator>
-	typename ft::iterator_traits<T_iterator>::difference_type	compute_diffence(T_iterator first, T_iterator last, std::random_access_iterator_tag) {
-		return (last - first);
-	}
-
-	template <typename T_iterator>
-	typename ft::iterator_traits<T_iterator>::difference_type	compute_diffence(T_iterator first, T_iterator last, std::bidirectional_iterator_tag) {
-		size_t	i = 0;
-		while (first != last){
-			first++;
-			i++;
-		}
-		return (i);
-	}
-
-	template <typename T_iterator>
-	typename ft::iterator_traits<T_iterator>::difference_type	compute_diffence(T_iterator first, T_iterator last, std::input_iterator_tag) {
-		size_t	i = 0;
-		while (first != last){
-			first++;
-			i++;
-		}
-		return (i);
-	}
-
 	/*  ------------------  MY STANDARD_ITERATOR  -----------------*/
 	template <typename T>
 	class	standard_tab_iterator : public std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&> {
@@ -513,7 +384,7 @@ namespace ft {
 			}
 
 			template <class InputIterator>
-			void assign (InputIterator first, InputIterator last, typename ft::enable_if<!is_integral<InputIterator>::value, InputIterator>::type = NULL) {
+			void assign (InputIterator first, InputIterator last, typename ft::enable_if<!is_integral<InputIterator>::value, int>::type = 0) {
 				this->erase(this->begin(), this->end());
 				this->insert(this->end(), first, last);
 			}
