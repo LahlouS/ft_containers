@@ -1,33 +1,16 @@
-#include <vector>
-#include "stack.hpp"
-// #include <stack>
+#include <map>
 #include <iostream>
 
 #define BN "\n"
 
 int main(void){
-	ft::stack<int> s;
-	ft::stack<int> s2;
+	std::pair<int, std::string> pair_test[3] = {std::make_pair<int, std::string>(85, "sacha"), std::make_pair<int, std::string>(68, "papa"), std::make_pair<int, std::string>(68, "armelle")};
 
-	for(int i = 0; i < 5; i++) {
-		s.push(42 + i);
-		s2.push(42 + i);
-	}
+	std::map<int, std::string> map_test(pair_test, pair_test + 3);
 
-	std::cout << std::boolalpha;
-	std::cout << (s != s2) << BN;
-	std::cout << (s == s2) << BN;
-	std::cout << (s < s2) << BN;
-	std::cout << (s <= s2) << BN;
-	std::cout << (s > s2) << BN;
-	std::cout << (s >= s2) << BN;
-
-	std::cout << "printing the content of my stack" << BN;
-	for(; !s.empty(); ) {
-		std::cout << "s.top : " << s.top() << BN;
-		s.pop();
-	}
-
+	for (std::map<int, std::string>::iterator it = map_test.begin(); it != map_test.end(); it++)
+		std::cout << it->first << " : " << it->second << BN;
+	std::cout << BN;
 
 	return (0);
 }
