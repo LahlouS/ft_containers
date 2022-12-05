@@ -27,11 +27,11 @@ namespace ft {
 			}
 
 			reference top() {
-				return ((c[c.size() - 1]));
+				return ((c.back()));
 			}
 
 			const_reference top() const {
-				return ((c[c.size() - 1]));
+				return ((c.back()));
 			}
 
 			void push (const value_type& val) {
