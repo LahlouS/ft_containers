@@ -28,20 +28,43 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 		typedef	typename	ft::reverse_iterator<iterator>			reverse_iterator;
 		typedef	typename	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
+		typedef struct node {
+
+		node(){}
+		node(ft::pair<const key, T> new_data, node* p, node* r, node* l) : this->data(new_data), parent(p), rightChild(r), leftChild(l) {}
+		~node();
+		ft::pair<const key, T> data;
+		node*	parent;
+		node*	rightChild;
+		node*	leftChild;
+
+		} node;
+
 		/*  -------------  Constructors  -----------------------------------*/
 
-		map();
-		explicit map( const Compare& comp, const Allocator& alloc = Allocator() ) : _mhandle(), _head(NULL), _size(0), _capacity(0), _compAlgo(comp);
-		map();
-		map();
-		~map();
+		map() : _head(NULL), _size(0), _capacity(0),  {}
+		explicit map( const Compare& comp, const Allocator& alloc = Allocator() ) : _head(NULL), _size(0), _capacity(0), _compAlgo(comp);
+		~map() {  /*  nothing to put for the moment  */  }
+
+		bool	_bst_insert(node *current_node, reference new_data) {
+			if (!currentNode->rightChild && !current_node->leftChild)
+				_newNode(currentNode, new_data);
+			else if (_compAlgo(currentNode, new_data))
+				bst_insert(currentNode->rightChild, new_data);
+			else
+				bst_insert(current_node->left, newdata);
+		}
+
+		void	_newNode(currentNode, new_data) {
+			new _node;
+		}
 
 		private :
-		allocator_type	_mhandle;
-		pointer			_head;
-		size_type		_size;
-		size_type		_capacity;
-		key_compare		_compAlgo;
+			allocator_type	_mhandle;
+			node			_head;
+			size_type		_size;
+			size_type		_capacity;
+			key_compare		_compAlgo;
 
 
 	};
