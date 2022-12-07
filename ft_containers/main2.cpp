@@ -1,17 +1,26 @@
 #include <map>
 #include <iostream>
-
+#include "traits_utils_pair.hpp"
+#include "map.hpp"
 #define BN "\n"
 
 int main(void){
-	std::pair<int, std::string> pair_test[3] = {std::make_pair<int, std::string>(85, "sacha"), std::make_pair<int, std::string>(68, "papa"), std::make_pair<int, std::string>(68, "armelle")};
+	ft::map<int, int> test;
 
-	std::map<int, std::string> map_test(pair_test, pair_test + 3);
+	test.insert(ft::make_pair(5, 0));
+	test.insert(ft::make_pair(10, 0));
+	test.insert(ft::make_pair(9, 0));
+	test.insert(ft::make_pair(3, 0));
+	test.insert(ft::make_pair(1, 0));
+	test.insert(ft::make_pair(4, 0));
+	test.insert(ft::make_pair(32, 0));
+	test.insert(ft::make_pair(-5, 0));
 
-	for (std::map<int, std::string>::iterator it = map_test.begin(); it != map_test.end(); it++)
-		std::cout << it->first << " : " << it->second << BN;
-	std::cout << BN;
 
+
+
+
+	test.printBT();
 	return (0);
 }
 
