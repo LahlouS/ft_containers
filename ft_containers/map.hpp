@@ -65,7 +65,6 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 		}
 
 		~map() {
-			std::cout << "Default ~map destructor called\n\n";
 			this->_freeTree(this->_head);
 			delete _leaf;
 		}
@@ -115,39 +114,40 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 			node* uncl = (uncl1 == parent) ? uncl2 : uncl1;
 			if (child != this->_head && parent->color == RED) {
 				if (uncl->color == RED) {
-					parent.color = BLACK;
-					uncl.color = BLACK;
-					gParent.color = RED;
+					parent->color = BLACK;
+					uncl->color = BLACK;
+					gParent->color = RED;
 				}
 				else if (uncl == BLACK)
 				{
+					bool	colorTmp = 0;
 					short test = ((child == parent->leftChild) * 1) + (parent == gParent->leftChild) * 2 \
-								+ ((child == parent->rightChild) * 3) + (parent == gParent->rightChild) * 5
+								+ ((child == parent->rightChild) * 3) + (parent == gParent->rightChild) * 5;
 					switch (test) {
 						case LLR :
-							bool	colorTmp = parent->color;
+							colorTmp = parent->color;
 							parent->color = gParent->color;
-							gparent->color = temp;
+							gParent->color = colorTmp;
 							rightRotation(parent, gParent);
 							break ;
 						case RRR :
-							bool	colorTmp = parent->color;
+							colorTmp = parent->color;
 							parent->color = gParent->color;
-							gparent->color = temp;
+							gParent->color = colorTmp;
 							leftRotation(parent, gParent);
 							break ;
 						case LRR :
 							rightRotation(child, parent);
-							bool	colorTmp = parent->color;
+							colorTmp = parent->color;
 							parent->color = gParent->color;
-							gparent->color = temp;
+							gParent->color = colorTmp;
 							leftRotation(parent, gParent);
 							break ;
 						case RLR :
 							leftRotation(child, parent);
-							bool	colorTmp = parent->color;
+							colorTmp = parent->color;
 							parent->color = gParent->color;
-							gparent->color = temp;
+							gParent->color = colorTmp;
 							rightRotation(parent, gParent);
 							break ;
 						default :
@@ -159,16 +159,22 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 
 		void	_dive(node* current, const_reference data) {
 			bool way = _compAlgo.operator()(current->data->first, data.first);
-			if (current->rightChild == this->_leaf && way)
+			if (current->rightChild == this->_leaf && way) {
 				current->rightChild = _insertNewElement(current, data, RED);
-			else if (current->leftChild == this->_leaf && !way)
+				current = current->rightChild;
+			}
+			else if (current->leftChild == this->_leaf && !way) {
 				current->leftChild = _insertNewElement(current, data, RED);
+				current = current->leftChild;
+			}
 			else if (way)
 				_dive(current->rightChild, data);
 			else if (!way)
 				_dive(current->leftChild, data);
-			if (current->color == BLACK)
+			if (current->parent != NULL && current->parent->parent) {
+				std::cout << "je suis ;a \n\n";
 				_balance(current, current->parent, current->parent->parent, current->parent->parent->rightChild, current->parent->parent->leftChild);
+			}
 		}
 
 		void printBT(const std::string& prefix, const node* nude, bool isLeft)
