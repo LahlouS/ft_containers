@@ -16,10 +16,6 @@ int main(void){
 	test.insert(ft::make_pair(32, 0));
 	test.insert(ft::make_pair(-5, 0));
 
-
-
-
-
 	test.printBT();
 	return (0);
 }

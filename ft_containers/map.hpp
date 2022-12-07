@@ -10,6 +10,11 @@
 #define RED 1
 #define BLACK 0
 
+#define LLR 3
+#define LRR 6
+#define RRR 8
+#define RLR 5
+
 namespace ft {
 template< class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<ft::pair<const Key, T> > >
 	class map {
@@ -80,20 +85,90 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 				this->_head = _insertNewElement(NULL, new_data, BLACK);
 		}
 
+		void	rightRotation(node* little, node *big) {
+				node* tmp = little->rightChild;
+				little->rightChild = big;
+				big->leftChild = tmp;
+				big->leftChild->parent = big;
+				little->parent = big->parent;
+				big->parent = little->rightChild;
+				if (little->parent->leftChild == big)
+					little->parent->leftChild = little;
+				else
+					little->parent->rightChild = little;
+		}
+
+		void	leftRotation(node* little, node* big) {
+			node *tmp = little->leftChild;
+			little->leftChild = big;
+			big->rightChild = tmp;
+			big->rightChild->parent = big;
+			little->parent = big->parent;
+			big->parent = little->leftChild;
+			if (little->parent->rightChild == big)
+				little->parent->rightChild = little;
+			else
+				little->parent->rightChild = little;
+		}
+
+		void	_balance(node* child, node* parent, node* gParent, node* uncl1, node* uncl2){
+			node* uncl = (uncl1 == parent) ? uncl2 : uncl1;
+			if (child != this->_head && parent->color == RED) {
+				if (uncl->color == RED) {
+					parent.color = BLACK;
+					uncl.color = BLACK;
+					gParent.color = RED;
+				}
+				else if (uncl == BLACK)
+				{
+					short test = ((child == parent->leftChild) * 1) + (parent == gParent->leftChild) * 2 \
+								+ ((child == parent->rightChild) * 3) + (parent == gParent->rightChild) * 5
+					switch (test) {
+						case LLR :
+							bool	colorTmp = parent->color;
+							parent->color = gParent->color;
+							gparent->color = temp;
+							rightRotation(parent, gParent);
+							break ;
+						case RRR :
+							bool	colorTmp = parent->color;
+							parent->color = gParent->color;
+							gparent->color = temp;
+							leftRotation(parent, gParent);
+							break ;
+						case LRR :
+							rightRotation(child, parent);
+							bool	colorTmp = parent->color;
+							parent->color = gParent->color;
+							gparent->color = temp;
+							leftRotation(parent, gParent);
+							break ;
+						case RLR :
+							leftRotation(child, parent);
+							bool	colorTmp = parent->color;
+							parent->color = gParent->color;
+							gparent->color = temp;
+							rightRotation(parent, gParent);
+							break ;
+						default :
+							break ;
+					}
+				}
+			}
+		}
+
 		void	_dive(node* current, const_reference data) {
 			bool way = _compAlgo.operator()(current->data->first, data.first);
-			if (current->rightChild == this->_leaf && way) {
+			if (current->rightChild == this->_leaf && way)
 				current->rightChild = _insertNewElement(current, data, RED);
-			}
-			else if (current->leftChild == this->_leaf && !way) {
+			else if (current->leftChild == this->_leaf && !way)
 				current->leftChild = _insertNewElement(current, data, RED);
-			}
 			else if (way)
-			{
 				_dive(current->rightChild, data);
-			}
 			else if (!way)
 				_dive(current->leftChild, data);
+			if (current->color == BLACK)
+				_balance(current, current->parent, current->parent->parent, current->parent->parent->rightChild, current->parent->parent->leftChild);
 		}
 
 		void printBT(const std::string& prefix, const node* nude, bool isLeft)
@@ -110,8 +185,8 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 				else
 					std::cout << " #" << std::endl;
 				// enter the next tree level - left and right branch
-				printBT( prefix + (isLeft ? "│   " : "    "), nude->leftChild, true);
-				printBT( prefix + (isLeft ? "│   " : "    "), nude->rightChild, false);
+				printBT( prefix + (isLeft ? "│   " : "    "), nude->rightChild, true);
+				printBT( prefix + (isLeft ? "│   " : "    "), nude->leftChild, false);
 			}
 		}
 
