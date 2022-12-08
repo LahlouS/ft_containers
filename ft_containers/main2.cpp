@@ -7,9 +7,13 @@
 int main(void){
 	ft::map<int, int> test;
 
-	test.insert(ft::make_pair(5, 0));
-	test.insert(ft::make_pair(10, 0));
-	test.insert(ft::make_pair(9, 0));
+	test.insert(ft::make_pair(3, 0));
+	test.insert(ft::make_pair(21, 0));
+	test.insert(ft::make_pair(32, 0));
+	test.insert(ft::make_pair(15, 0));
+	test.insert(ft::make_pair(16, 0));
+	test.insert(ft::make_pair(24, 0));
+	test.insert(ft::make_pair(7, 0));
 
 
 	test.printBT();

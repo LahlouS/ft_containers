@@ -88,12 +88,15 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 				node* tmp = little->rightChild;
 				little->rightChild = big;
 				big->leftChild = tmp;
-				big->leftChild->parent = big;
+				if (big->leftChild != this->_leaf)
+					big->leftChild->parent = big;
 				little->parent = big->parent;
-				big->parent = little->rightChild;
-				if (little->parent->leftChild == big)
+				big->parent = little;
+				if (big == this->_head)
+					this->_head = little;
+				if (little->parent && little->parent->leftChild == big)
 					little->parent->leftChild = little;
-				else
+				else if (little->parent)
 					little->parent->rightChild = little;
 		}
 
@@ -101,54 +104,64 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 			node *tmp = little->leftChild;
 			little->leftChild = big;
 			big->rightChild = tmp;
-			big->rightChild->parent = big;
+			if (big->rightChild != this->_leaf)
+				big->rightChild->parent = big;
 			little->parent = big->parent;
-			big->parent = little->leftChild;
-			if (little->parent->rightChild == big)
+			big->parent = little;
+			if (big == this->_head)
+				this->_head = little;
+			if (little->parent && little->parent->rightChild == big)
 				little->parent->rightChild = little;
-			else
-				little->parent->rightChild = little;
+			else if (little->parent)
+				little->parent->leftChild = little;
 		}
 
-		void	_balance(node* child, node* parent, node* gParent, node* uncl1, node* uncl2){
-			node* uncl = (uncl1 == parent) ? uncl2 : uncl1;
+		void	_balance(node* child, node* parent, node* gParent, node* unclRight, node* unclLeft){
+			if (child == this->_head)
+				child->color = BLACK;
+			node* uncl = (unclRight == parent) ? unclLeft : unclRight;
 			if (child != this->_head && parent->color == RED) {
 				if (uncl->color == RED) {
 					parent->color = BLACK;
 					uncl->color = BLACK;
 					gParent->color = RED;
+					_balance(gParent, gParent->parent, NULL, NULL, NULL);
 				}
-				else if (uncl == BLACK)
+				else if (uncl->color == BLACK)
 				{
 					bool	colorTmp = 0;
 					short test = ((child == parent->leftChild) * 1) + (parent == gParent->leftChild) * 2 \
 								+ ((child == parent->rightChild) * 3) + (parent == gParent->rightChild) * 5;
 					switch (test) {
 						case LLR :
+							std::cout << "CASE : 1\n\n";
+							rightRotation(parent, gParent);
 							colorTmp = parent->color;
 							parent->color = gParent->color;
 							gParent->color = colorTmp;
-							rightRotation(parent, gParent);
 							break ;
 						case RRR :
+							std::cout << "CASE : 2 " << parent->data->first << " " << gParent->data->first << BN << BN;
+							leftRotation(parent, gParent);
 							colorTmp = parent->color;
 							parent->color = gParent->color;
 							gParent->color = colorTmp;
-							leftRotation(parent, gParent);
 							break ;
 						case LRR :
+							std::cout << "CASE : 3\n\n";
 							rightRotation(child, parent);
-							colorTmp = parent->color;
-							parent->color = gParent->color;
+							leftRotation(child, gParent);
+							colorTmp = child->color;
+							child->color = gParent->color;
 							gParent->color = colorTmp;
-							leftRotation(parent, gParent);
 							break ;
 						case RLR :
+							std::cout << "CASE : 4\n\n";
 							leftRotation(child, parent);
-							colorTmp = parent->color;
-							parent->color = gParent->color;
+							rightRotation(child, gParent);
+							colorTmp = child->color;
+							child->color = gParent->color;
 							gParent->color = colorTmp;
-							rightRotation(parent, gParent);
 							break ;
 						default :
 							break ;
@@ -167,12 +180,13 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 				current->leftChild = _insertNewElement(current, data, RED);
 				current = current->leftChild;
 			}
-			else if (way)
+			else if (way) {
 				_dive(current->rightChild, data);
-			else if (!way)
+			}
+			else if (!way) {
 				_dive(current->leftChild, data);
-			if (current->parent != NULL && current->parent->parent) {
-				std::cout << "je suis ;a \n\n";
+			}
+			if (current->parent != NULL && current->parent->parent != NULL) {
 				_balance(current, current->parent, current->parent->parent, current->parent->parent->rightChild, current->parent->parent->leftChild);
 			}
 		}
