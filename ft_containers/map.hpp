@@ -116,19 +116,26 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 				little->parent->leftChild = little;
 		}
 
-		void	_balance(node* child, node* parent, node* gParent, node* unclRight, node* unclLeft){
-			if (child == this->_head)
-				child->color = BLACK;
+		bool	_balance(node* child){
+
+			node* parent = _getUp(child);
+			node* gParent = _getUp(parent);
+			node* unclRight = _getRight(gParent);
+			node* unclLeft = _getLeft(gParent);
 			node* uncl = (unclRight == parent) ? unclLeft : unclRight;
-			if (child != this->_head && parent->color == RED) {
-				if (uncl->color == RED) {
+			if (child == this->_head) {
+				child->color = BLACK;
+				return (1);
+			} else if (child->color == RED && child != this->_head && parent && parent->color == RED) {
+				if (uncl && uncl->color == RED) {
 					parent->color = BLACK;
 					uncl->color = BLACK;
 					gParent->color = RED;
-					_balance(gParent, gParent->parent, NULL, NULL, NULL);
-				}
-				else if (uncl->color == BLACK)
-				{
+					if (parent && gParent && uncl) {
+						std::cout << "child->data->first : " << child->data->first << BN;
+						return (0);
+					}
+				} else if (uncl->color == BLACK) {
 					bool	colorTmp = 0;
 					short test = ((child == parent->leftChild) * 1) + (parent == gParent->leftChild) * 2 \
 								+ ((child == parent->rightChild) * 3) + (parent == gParent->rightChild) * 5;
@@ -166,11 +173,14 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 						default :
 							break ;
 					}
+					return (1);
 				}
 			}
+			return (1);
 		}
 
 		void	_dive(node* current, const_reference data) {
+			//static bool test = 1;
 			bool way = _compAlgo.operator()(current->data->first, data.first);
 			if (current->rightChild == this->_leaf && way) {
 				current->rightChild = _insertNewElement(current, data, RED);
@@ -186,9 +196,7 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 			else if (!way) {
 				_dive(current->leftChild, data);
 			}
-			if (current->parent != NULL && current->parent->parent != NULL) {
-				_balance(current, current->parent, current->parent->parent, current->parent->parent->rightChild, current->parent->parent->leftChild);
-			}
+			_balance(current);
 		}
 
 		void printBT(const std::string& prefix, const node* nude, bool isLeft)
@@ -226,6 +234,25 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 				_mhandle.deallocate(current->data, 1);
 				delete current;
 			}
+
+			node*	_getUp(node *from){
+				if (from && from->parent)
+					return (from->parent);
+				return (NULL);
+			}
+
+			node*	_getRight(node *from){
+				if (from && from->rightChild)
+					return (from->rightChild);
+				return (NULL);
+			}
+
+			node*	_getLeft(node *from){
+				if (from && from->leftChild)
+					return (from->leftChild);
+				return (NULL);
+			}
+
 		/*  ------------- private attributes  ---------------*/
 			allocator_type	_mhandle;
 			node*			_head;

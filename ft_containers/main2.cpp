@@ -13,7 +13,13 @@ int main(void){
 	test.insert(ft::make_pair(15, 0));
 	test.insert(ft::make_pair(16, 0));
 	test.insert(ft::make_pair(24, 0));
+	test.insert(ft::make_pair(26, 0));
 	test.insert(ft::make_pair(7, 0));
+	test.insert(ft::make_pair(5, 0));
+	test.insert(ft::make_pair(14, 0));
+	test.insert(ft::make_pair(13, 0));
+	test.insert(ft::make_pair(17, 0));
+	test.insert(ft::make_pair(12, 0));
 
 
 	test.printBT();
