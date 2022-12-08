@@ -84,7 +84,7 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 				this->_head = _insertNewElement(NULL, new_data, BLACK);
 		}
 
-		void	rightRotation(node* little, node *big) {
+		void	_rightRotation(node* little, node *big) {
 				node* tmp = little->rightChild;
 				little->rightChild = big;
 				big->leftChild = tmp;
@@ -100,7 +100,7 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 					little->parent->rightChild = little;
 		}
 
-		void	leftRotation(node* little, node* big) {
+		void	_leftRotation(node* little, node* big) {
 			node *tmp = little->leftChild;
 			little->leftChild = big;
 			big->rightChild = tmp;
@@ -130,9 +130,6 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 					parent->color = BLACK;
 					uncl->color = BLACK;
 					gParent->color = RED;
-					if (parent && gParent && uncl) {
-						std::cout << "child->data->first : " << child->data->first << BN;
-					}
 				} else if (uncl->color == BLACK) {
 					bool	colorTmp = 0;
 					short test = ((child == parent->leftChild) * 1) + (parent == gParent->leftChild) * 2 \
@@ -140,30 +137,30 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 					switch (test) {
 						case LLR :
 							std::cout << "CASE : 1\n\n";
-							rightRotation(parent, gParent);
+							_rightRotation(parent, gParent);
 							colorTmp = parent->color;
 							parent->color = gParent->color;
 							gParent->color = colorTmp;
 							break ;
 						case RRR :
-							std::cout << "CASE : 2 " << parent->data->first << " " << gParent->data->first << BN << BN;
-							leftRotation(parent, gParent);
+							std::cout << "CASE : 2 \n\n";
+							_leftRotation(parent, gParent);
 							colorTmp = parent->color;
 							parent->color = gParent->color;
 							gParent->color = colorTmp;
 							break ;
 						case LRR :
 							std::cout << "CASE : 3\n\n";
-							rightRotation(child, parent);
-							leftRotation(child, gParent);
+							_rightRotation(child, parent);
+							_leftRotation(child, gParent);
 							colorTmp = child->color;
 							child->color = gParent->color;
 							gParent->color = colorTmp;
 							break ;
 						case RLR :
 							std::cout << "CASE : 4\n\n";
-							leftRotation(child, parent);
-							rightRotation(child, gParent);
+							_leftRotation(child, parent);
+							_rightRotation(child, gParent);
 							colorTmp = child->color;
 							child->color = gParent->color;
 							gParent->color = colorTmp;
@@ -176,22 +173,25 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 		}
 
 		void	_dive(node* current, const_reference data) {
-			//static bool test = 1;
-			bool way = _compAlgo.operator()(current->data->first, data.first);
-			if (current->rightChild == this->_leaf && way) {
+			bool isBiggest = 1;
+			if (current->rightChild == this->_leaf && _compAlgo.operator()(current->data->first, data.first)) {
 				current->rightChild = _insertNewElement(current, data, RED);
 				current = current->rightChild;
+				current->right->parent = current;
 			}
-			else if (current->leftChild == this->_leaf && !way) {
+			else if (current->leftChild == this->_leaf && _compAlgo.operator()(data.first, current->data->first)) {
+				isBiggest = 0;
 				current->leftChild = _insertNewElement(current, data, RED);
 				current = current->leftChild;
 			}
-			else if (way) {
+			else if (_compAlgo.operator()(current->data->first, data.first)) {
 				_dive(current->rightChild, data);
 			}
-			else if (!way) {
+			else if (_compAlgo.operator()(data.first, current->data->first)) {
 				_dive(current->leftChild, data);
 			}
+			else
+				return ;
 			_balance(current);
 		}
 
