@@ -116,7 +116,7 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 				little->parent->leftChild = little;
 		}
 
-		bool	_balance(node* child){
+		void	_balance(node* child){
 
 			node* parent = _getUp(child);
 			node* gParent = _getUp(parent);
@@ -125,7 +125,6 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 			node* uncl = (unclRight == parent) ? unclLeft : unclRight;
 			if (child == this->_head) {
 				child->color = BLACK;
-				return (1);
 			} else if (child->color == RED && child != this->_head && parent && parent->color == RED) {
 				if (uncl && uncl->color == RED) {
 					parent->color = BLACK;
@@ -133,7 +132,6 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 					gParent->color = RED;
 					if (parent && gParent && uncl) {
 						std::cout << "child->data->first : " << child->data->first << BN;
-						return (0);
 					}
 				} else if (uncl->color == BLACK) {
 					bool	colorTmp = 0;
@@ -173,10 +171,8 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 						default :
 							break ;
 					}
-					return (1);
 				}
 			}
-			return (1);
 		}
 
 		void	_dive(node* current, const_reference data) {
