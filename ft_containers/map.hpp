@@ -15,10 +15,17 @@
 #define RRR 8
 #define RLR 5
 
+#define SIBLING_IS_L 0
+#define SIBLING_IS_R 1
+#define SIBLING_IS_RED 2
+#define NEPHEW_R_IS_RED 4
+#define NEPHEW_L_IS_RED 8
+
 namespace ft {
-template< class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<ft::pair<const Key, T> > >
-	class map {
-		public :
+
+	template< class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<ft::pair<const Key, T> > >
+		class map {
+			public :
 
 		/*  -------------  Member_types  -----------------------------------*/
 
@@ -79,8 +86,44 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 					ret = this->_dive(_head, val, isbigger, isOk);
 				else
 					ret = this->_head = _insertNewElement(NULL, val, BLACK);
-				std::cout << "---> key : " << ret->data->first << " isBigger" << isbigger << " isOk " << isOk << BN;
+				//std::cout << "---> key : " << ret->data->first << " isBigger" << isbigger << " isOk " << isOk << BN;
 				// return (ft::make_pair<>)
+			}
+
+			void	erase(const value_type& val) {
+				bool	isbigger	= 1;
+				bool	isOk 		= 1;
+				node*	rm			= _dive(_head, val, isbigger, isOk);
+				node*	substitute	= NULL;
+				bool	blackBlack	= 0;
+
+				if (this->_head == this->_leaf)
+					return ;
+				if (isOk) {
+					// dont forget that the value has been added to your tree !!
+				} else if (rm) {
+					substitute = _find_subsitute(rm);
+					std::cout << "node to remove is : " << rm->data->first << " and substitute is : " << substitute->data->first << BN << BN;
+					_mhandle.destroy(rm->data);
+					_mhandle.deallocate(rm->data, 1);
+					rm->data = substitute->data;
+					node*	tmp = NULL;
+					if (substitute->rightChild == this->_leaf && substitute->leftChild == this->_leaf)
+						tmp = this->_leaf;
+					else if (substitute->rightChild != this->_leaf)
+						tmp = substitute->rightChild;
+					else if (substitute->leftChild != this->_leaf)
+						tmp = substitute->leftChild;
+					if (substitute->parent && substitute->parent->rightChild == substitute)
+						substitute->parent->rightChild = tmp;
+					else if (substitute->parent && substitute->parent->leftChild == substitute)
+						substitute->parent->leftChild = tmp;
+					if (tmp && tmp->color == BLACK)
+						blackBlack = 1;
+					if (blackBlack)
+						_XtremRotateStreamMultiThreadedTree(tmp, substitute->parent);
+					delete substitute;
+				}
 			}
 
 			// iterator insert (iterator position, const value_type& val) {
@@ -97,6 +140,90 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 			}
 
 		private :
+
+			node* _find_subsitute(node *root) {
+				if (root->rightChild == _leaf && root->leftChild == _leaf)
+					return (root);
+				else if (root->rightChild && root->leftChild == _leaf) {
+					return (root->rightChild);
+				}
+				else if (root->leftChild && root->rightChild == _leaf) {
+					return (root->leftChild);
+				}
+				else if (root->leftChild != _leaf && root->rightChild != _leaf) {
+					node* temp = root->leftChild;
+					while (temp->rightChild != _leaf)
+						temp = temp->rightChild;
+					return (temp);
+				}
+				return (NULL);
+			}
+
+			void	_checkDansQuelPetrinJeSuis(int& case_flag, node* root, node* rootParent) {
+				case_flag = 0;
+				if (rootParent)
+				{
+					case_flag |= (rootParent->leftChild == root);
+					if (case_flag)
+					{
+						case_flag |= (rootParent->rightChild->color == BLACK) * 2;
+						case_flag |= (rootParent->rightChild->rightChild->color == RED) * 4;
+						case_flag |= (rootParent->rightChild->leftChild->color == RED) * 8;
+					}
+					else
+					{
+						case_flag |= (rootParent->leftChild->color == BLACK) * 2;
+						case_flag |= (rootParent->leftChild->rightChild->color == RED) * 4;
+						case_flag |= (rootParent->leftChild->leftChild->color == RED) * 8;
+					}
+				}
+			}
+
+			void	_XtremRotateStreamMultiThreadedTree(node* tmp, node* parent) {
+				int	case_flag = 0;
+
+				_checkDansQuelPetrinJeSuis(case_flag, tmp, parent);
+				if ((case_flag & SIBLING_IS_RED) == 0 && ((case_flag & NEPHEW_R_IS_RED) || (case_flag & NEPHEW_L_IS_RED)))
+				{
+					if ((case_flag & (NEPHEW_R_IS_RED + SIBLING_IS_L)) == (NEPHEW_R_IS_RED + SIBLING_IS_L)) {
+						parent->leftChild->rightChild->color = parent->color;
+						_rightRotation(parent->leftChild->rightChild, parent->leftChild);
+						_leftRotation(parent->leftChild, parent);
+					} else if ((case_flag & (NEPHEW_L_IS_RED + SIBLING_IS_L)) == (NEPHEW_L_IS_RED + SIBLING_IS_L)) {
+						parent->leftChild->leftChild->color = parent->leftChild->color;
+						parent->leftChild->color = parent->color;
+						_rightRotation(parent->leftChild, parent);
+					} else if ((case_flag & (NEPHEW_R_IS_RED + SIBLING_IS_R)) == (NEPHEW_R_IS_RED + SIBLING_IS_R)) {
+						parent->rightChild->rightChild->color = parent->rightChild->color;
+						parent->rightChild->color = parent->color;
+						_leftRotation(parent->rightChild, parent);
+					} else if ((case_flag & (NEPHEW_L_IS_RED + SIBLING_IS_R)) == (NEPHEW_L_IS_RED + SIBLING_IS_R)) {
+						parent->rightChild->leftChild->color = parent->color;
+						_rightRotation(parent->rightChild->leftChild, parent->rightChild);
+						_leftRotation(parent->rightChild, parent);
+					}
+				} else if (!(case_flag & NEPHEW_R_IS_RED) && !(case_flag & NEPHEW_L_IS_RED)) {
+					if ((case_flag & SIBLING_IS_L) == SIBLING_IS_L)
+						parent->leftChild->color = RED;
+					else if ((case_flag & SIBLING_IS_R) == SIBLING_IS_L)
+						parent->rightChild->color = RED;
+					if (parent->color == BLACK)
+						_XtremRotateStreamMultiThreadedTree(parent, parent->parent);
+					else
+						parent->color = BLACK;
+				} else if ((case_flag & SIBLING_IS_RED) == 1) {
+						parent->color = RED;
+						if ((case_flag & SIBLING_IS_R) == SIBLING_IS_R) {
+							parent->rightChild->color = BLACK;
+							_leftRotation(parent->rightChild, parent);
+						} else if ((case_flag & SIBLING_IS_L) == SIBLING_IS_L) {
+							parent->leftChild->color = BLACK;
+							_rightRotation(parent->leftChild, parent);
+						}
+						_XtremRotateStreamMultiThreadedTree(tmp, parent);
+				}
+			}
+
 			node*	_insertNewElement(node *parent, const_reference data, bool color) {
 				pointer temp = _mhandle.allocate(1);
 				node*	tempNode;
@@ -138,7 +265,6 @@ template< class Key, class T, class Compare = std::less<Key>, class Allocator = 
 			}
 
 			void	_balance(node* child){
-
 				node* parent = _getUp(child);
 				node* gParent = _getUp(parent);
 				node* unclRight = _getRight(gParent);
