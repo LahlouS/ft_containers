@@ -9,16 +9,34 @@ int main(void){
 
 	test.insert(ft::make_pair(15, 0));
 	test.insert(ft::make_pair(12, 0));
-	test.insert(ft::make_pair(19, 0));
-	test.insert(ft::make_pair(23, 0));
-	test.insert(ft::make_pair(22, 0));
+	test.insert(ft::make_pair(32, 0));
 	test.insert(ft::make_pair(56, 0));
+	test.insert(ft::make_pair(1, 0));
+	test.insert(ft::make_pair(7, 0));
+	test.insert(ft::make_pair(9, 0));
+	test.insert(ft::make_pair(23, 0));
+	test.insert(ft::make_pair(89, 0));
+	test.insert(ft::make_pair(100, 0));
+	test.insert(ft::make_pair(66, 0));
+	test.insert(ft::make_pair(4, 0));
+
 
 	std::cout << "\n\nbefore deletion : \n";
 	test.printBT();
 	std::cout << "\n\n****after deletion****" << BN;
-	// test.erase(ft::make_pair(19, 0));
+	test.erase(ft::make_pair(56, 0));
+	test.erase(ft::make_pair(23, 0));
+	test.erase(ft::make_pair(15, 0));
+	test.erase(ft::make_pair(66, 0));
 	test.erase(ft::make_pair(12, 0));
+	test.erase(ft::make_pair(1, 0));
+	test.erase(ft::make_pair(32, 0));
+	test.erase(ft::make_pair(9, 0));
+	test.erase(ft::make_pair(89, 0));
+	test.erase(ft::make_pair(7, 0));
+	test.erase(ft::make_pair(4, 0));
+	test.erase(ft::make_pair(100, 0));
+
 	test.printBT();
 	return (0);
 }

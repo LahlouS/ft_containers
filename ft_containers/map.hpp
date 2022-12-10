@@ -3,6 +3,7 @@
 
 #include "traits_utils.hpp"
 #include "traits_utils_pair.hpp"
+#include <cstdlib>
 #include <iostream>
 
 #define BN "\n"
@@ -15,7 +16,7 @@
 #define RRR 8
 #define RLR 5
 
-#define SIBLING_IS_L 0
+#define SIBLING_IS_L 16
 #define SIBLING_IS_R 1
 #define SIBLING_IS_RED 2
 #define NEPHEW_R_IS_RED 4
@@ -72,7 +73,8 @@ namespace ft {
 			}
 
 			~map() {
-				this->_freeTree(this->_head);
+				if (this->_head != this->_leaf)
+					this->_freeTree(this->_head);
 				delete _leaf;
 			}
 
@@ -86,6 +88,8 @@ namespace ft {
 					ret = this->_dive(_head, val, isbigger, isOk);
 				else
 					ret = this->_head = _insertNewElement(NULL, val, BLACK);
+				if (isOk)
+					this->_size += 1;
 				//std::cout << "---> key : " << ret->data->first << " isBigger" << isbigger << " isOk " << isOk << BN;
 				// return (ft::make_pair<>)
 			}
@@ -93,40 +97,51 @@ namespace ft {
 
 
 			void	erase(const value_type& val) {
-				bool	isbigger	= 1;
-				bool	isOk 		= 1;
-				node*	rm			= _dive(_head, val, isbigger, isOk);
+				node*	rm			= _search(this->_head, val);//_dive(_head, val, isbigger, isOk);
 				node*	substitute	= NULL;
-				//bool	blackBlack	= 0;
 
 				if (this->_head == this->_leaf)
 					return ;
-				if (isOk) {
-					// dont forget that the value has been added to your tree !!
-				} else if (rm) {
+				if (rm) {
 					substitute = _find_subsitute(rm);
-					std::cout << "node to remove is : " << rm->data->first << " and substitute is : " << substitute->data->first << BN << BN;
 					node *legacy = _transplant(rm, substitute);
-					if (substitute->color == BLACK && legacy->color == BLACK) // meaning double black shit
+					if (substitute->color == BLACK && legacy->color == BLACK && substitute != this->_head) // meaning double black shit
 						_fixDoubleBlack(legacy, substitute->parent);
+					else
+						legacy->color = BLACK;
+					if (substitute == this->_head)
+						this->_head = this->_leaf;
 					delete substitute;
-				}
+				} else
+					std::cout << "no key found matching with : " << val.first << BN;
 			}
 
-			// iterator insert (iterator position, const value_type& val) {
-//
-			// }
+			/* Insert prototypes :
+			iterator insert (iterator position, const value_type& val) {
 
-			// template <class InputIterator>
-			// void insert (InputIterator first, InputIterator last) {
+			}
 
-			// }
+			template <class InputIterator>
+			void insert (InputIterator first, InputIterator last) {
+
+			}*/
 
 			void printBT() {
 				printBT("", this->_head, false);
 			}
 
 		private :
+
+			node*	_search(node* root, value_type const & val) {
+				if (root == this->_leaf)
+					return (NULL);
+				else if (_compAlgo.operator()(root->data->first, val.first))
+					return (this->_search(root->rightChild, val));
+				else if (_compAlgo.operator()(val.first, root->data->first))
+					return (this->_search(root->leftChild, val));
+				else
+					return (root);
+			}
 
 			node*	_transplant(node* rm, node* substitute) {
 				node*	tmp = NULL;
@@ -163,7 +178,8 @@ namespace ft {
 					node* temp = root->leftChild;
 					while (temp->rightChild != _leaf)
 						temp = temp->rightChild;
-					return (_find_subsitute(temp));
+					return (temp);
+					// return (_find_subsitute(temp));
 				}
 				return (NULL);
 			}
@@ -185,6 +201,7 @@ namespace ft {
 						case_flag |= (rootParent->leftChild->rightChild->color == RED) * 4;
 						case_flag |= (rootParent->leftChild->leftChild->color == RED) * 8;
 					}
+					case_flag |= (rootParent->rightChild == root) * 16;
 				}
 			}
 
@@ -193,12 +210,18 @@ namespace ft {
 				if (tmp == this->_head)
 					return ;
 				_checkDansQuelPetrinJeSuis(case_flag, tmp, parent);
+				if (!(case_flag & SIBLING_IS_L) && !(case_flag & SIBLING_IS_R)) {
+					if (parent && parent->parent)
+						_fixDoubleBlack(parent, parent->parent);
+					else
+						return ;
+				}
 				if ((case_flag & SIBLING_IS_RED) == 0 && ((case_flag & NEPHEW_R_IS_RED) || (case_flag & NEPHEW_L_IS_RED)))
 				{
 					if ((case_flag & (NEPHEW_R_IS_RED + SIBLING_IS_L)) == (NEPHEW_R_IS_RED + SIBLING_IS_L)) {
 						parent->leftChild->rightChild->color = parent->color;
-						_rightRotation(parent->leftChild->rightChild, parent->leftChild);
-						_leftRotation(parent->leftChild, parent);
+						_leftRotation(parent->leftChild->rightChild, parent->leftChild);
+						_rightRotation(parent->leftChild, parent);
 					} else if ((case_flag & (NEPHEW_L_IS_RED + SIBLING_IS_L)) == (NEPHEW_L_IS_RED + SIBLING_IS_L)) {
 						parent->leftChild->leftChild->color = parent->leftChild->color;
 						parent->leftChild->color = parent->color;
@@ -213,11 +236,12 @@ namespace ft {
 						_leftRotation(parent->rightChild, parent);
 					}
 				} else if (!(case_flag & NEPHEW_R_IS_RED) && !(case_flag & NEPHEW_L_IS_RED) && (case_flag & SIBLING_IS_RED) == 0) {
-					//c la que tu commence a tester
-					if ((case_flag & SIBLING_IS_L) == SIBLING_IS_L)
+					if ((case_flag & SIBLING_IS_L) == SIBLING_IS_L) {
 						parent->leftChild->color = RED;
-					else if ((case_flag & SIBLING_IS_R) == SIBLING_IS_R)
+					}
+					else if ((case_flag & SIBLING_IS_R) == SIBLING_IS_R) {
 						parent->rightChild->color = RED;
+					}
 					if (parent->color == BLACK)
 						_fixDoubleBlack(parent, parent->parent);
 					else
@@ -231,7 +255,6 @@ namespace ft {
 							parent->leftChild->color = BLACK;
 							_rightRotation(parent->leftChild, parent);
 						}
-						 std::cout << "ICI OU LAS BAS -->" << BN;
 						_fixDoubleBlack(tmp, parent);
 				}
 			}
