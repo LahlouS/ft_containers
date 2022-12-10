@@ -78,7 +78,9 @@ namespace ft {
 				delete _leaf;
 			}
 
-
+			size_type	size() const {
+				return (this->_size);
+			}
 			// ft::pair<iterator,bool> insert (const value_type& val) {
 			void	insert (const value_type& val) {
 				node*	ret = NULL;
@@ -100,7 +102,7 @@ namespace ft {
 				node*	rm			= _search(this->_head, val);//_dive(_head, val, isbigger, isOk);
 				node*	substitute	= NULL;
 
-				if (this->_head == this->_leaf)
+				if (this->_head == this->_leaf || !this->_size)
 					return ;
 				if (rm) {
 					substitute = _find_subsitute(rm);
@@ -112,6 +114,8 @@ namespace ft {
 					if (substitute == this->_head)
 						this->_head = this->_leaf;
 					delete substitute;
+					this->_size -= 1;
+					this->_leaf->parent = _findBiggestVal(this->_head);
 				} else
 					std::cout << "no key found matching with : " << val.first << BN;
 			}
@@ -128,6 +132,7 @@ namespace ft {
 
 			void printBT() {
 				printBT("", this->_head, false);
+				std::cout << " ---> the bigger is : " << this->_leaf->parent->data->first << BN;
 			}
 
 		private :
@@ -235,6 +240,7 @@ namespace ft {
 						_rightRotation(parent->rightChild->leftChild, parent->rightChild);
 						_leftRotation(parent->rightChild, parent);
 					}
+					parent->color = BLACK;
 				} else if (!(case_flag & NEPHEW_R_IS_RED) && !(case_flag & NEPHEW_L_IS_RED) && (case_flag & SIBLING_IS_RED) == 0) {
 					if ((case_flag & SIBLING_IS_L) == SIBLING_IS_L) {
 						parent->leftChild->color = RED;
@@ -297,6 +303,13 @@ namespace ft {
 					little->parent->rightChild = little;
 				else if (little->parent)
 					little->parent->leftChild = little;
+			}
+
+			node*	_findBiggestVal(node* root) {
+				if (root->rightChild != this->_leaf)
+					return (_findBiggestVal(root->rightChild));
+				else
+					return (root);
 			}
 
 			void	_balance(node* child){

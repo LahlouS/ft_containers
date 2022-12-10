@@ -19,8 +19,13 @@ int main(void){
 	test.insert(ft::make_pair(100, 0));
 	test.insert(ft::make_pair(66, 0));
 	test.insert(ft::make_pair(4, 0));
+	test.insert(ft::make_pair(1045, 0));
+	test.insert(ft::make_pair(1042, 0));
+	test.insert(ft::make_pair(104, 0));
+	test.insert(ft::make_pair(1245, 0));
+	test.insert(ft::make_pair(-104, 0));
 
-
+	std::cout << "----------- > size : " << test.size();
 	std::cout << "\n\nbefore deletion : \n";
 	test.printBT();
 	std::cout << "\n\n****after deletion****" << BN;
@@ -36,6 +41,7 @@ int main(void){
 	test.erase(ft::make_pair(7, 0));
 	test.erase(ft::make_pair(4, 0));
 	test.erase(ft::make_pair(100, 0));
+	test.erase(ft::make_pair(1245, 0));
 
 	test.printBT();
 	return (0);
