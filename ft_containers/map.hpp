@@ -90,12 +90,14 @@ namespace ft {
 				// return (ft::make_pair<>)
 			}
 
+
+
 			void	erase(const value_type& val) {
 				bool	isbigger	= 1;
 				bool	isOk 		= 1;
 				node*	rm			= _dive(_head, val, isbigger, isOk);
 				node*	substitute	= NULL;
-				bool	blackBlack	= 0;
+				//bool	blackBlack	= 0;
 
 				if (this->_head == this->_leaf)
 					return ;
@@ -104,24 +106,9 @@ namespace ft {
 				} else if (rm) {
 					substitute = _find_subsitute(rm);
 					std::cout << "node to remove is : " << rm->data->first << " and substitute is : " << substitute->data->first << BN << BN;
-					_mhandle.destroy(rm->data);
-					_mhandle.deallocate(rm->data, 1);
-					rm->data = substitute->data;
-					node*	tmp = NULL;
-					if (substitute->rightChild == this->_leaf && substitute->leftChild == this->_leaf)
-						tmp = this->_leaf;
-					else if (substitute->rightChild != this->_leaf)
-						tmp = substitute->rightChild;
-					else if (substitute->leftChild != this->_leaf)
-						tmp = substitute->leftChild;
-					if (substitute->parent && substitute->parent->rightChild == substitute)
-						substitute->parent->rightChild = tmp;
-					else if (substitute->parent && substitute->parent->leftChild == substitute)
-						substitute->parent->leftChild = tmp;
-					if (tmp && tmp->color == BLACK)
-						blackBlack = 1;
-					if (blackBlack)
-						_XtremRotateStreamMultiThreadedTree(tmp, substitute->parent);
+					node *legacy = _transplant(rm, substitute);
+					if (substitute->color == BLACK && legacy->color == BLACK) // meaning double black shit
+						_fixDoubleBlack(legacy, substitute->parent);
 					delete substitute;
 				}
 			}
@@ -141,6 +128,28 @@ namespace ft {
 
 		private :
 
+			node*	_transplant(node* rm, node* substitute) {
+				node*	tmp = NULL;
+
+				this->_mhandle.destroy(rm->data);
+				this->_mhandle.deallocate(rm->data, 1);
+				rm->data = substitute->data;
+
+				if (substitute->rightChild == this->_leaf && substitute->leftChild == this->_leaf)
+					tmp = this->_leaf;
+				else if (substitute->rightChild != this->_leaf)
+					tmp = substitute->rightChild;
+				else if (substitute->leftChild != this->_leaf)
+					tmp = substitute->leftChild;
+				if (substitute->parent && (substitute->parent->rightChild == substitute))
+					substitute->parent->rightChild = tmp;
+				else if (substitute->parent && substitute->parent->leftChild == substitute)
+					substitute->parent->leftChild = tmp;
+				if (tmp != this->_leaf)
+					tmp->parent = substitute->parent;
+				return (tmp);
+			}
+
 			node* _find_subsitute(node *root) {
 				if (root->rightChild == _leaf && root->leftChild == _leaf)
 					return (root);
@@ -154,7 +163,7 @@ namespace ft {
 					node* temp = root->leftChild;
 					while (temp->rightChild != _leaf)
 						temp = temp->rightChild;
-					return (temp);
+					return (_find_subsitute(temp));
 				}
 				return (NULL);
 			}
@@ -166,22 +175,23 @@ namespace ft {
 					case_flag |= (rootParent->leftChild == root);
 					if (case_flag)
 					{
-						case_flag |= (rootParent->rightChild->color == BLACK) * 2;
+						case_flag |= (rootParent->rightChild->color == RED) * 2;
 						case_flag |= (rootParent->rightChild->rightChild->color == RED) * 4;
 						case_flag |= (rootParent->rightChild->leftChild->color == RED) * 8;
 					}
 					else
 					{
-						case_flag |= (rootParent->leftChild->color == BLACK) * 2;
+						case_flag |= (rootParent->leftChild->color == RED) * 2;
 						case_flag |= (rootParent->leftChild->rightChild->color == RED) * 4;
 						case_flag |= (rootParent->leftChild->leftChild->color == RED) * 8;
 					}
 				}
 			}
 
-			void	_XtremRotateStreamMultiThreadedTree(node* tmp, node* parent) {
+			void	_fixDoubleBlack(node* tmp, node* parent) {
 				int	case_flag = 0;
-
+				if (tmp == this->_head)
+					return ;
 				_checkDansQuelPetrinJeSuis(case_flag, tmp, parent);
 				if ((case_flag & SIBLING_IS_RED) == 0 && ((case_flag & NEPHEW_R_IS_RED) || (case_flag & NEPHEW_L_IS_RED)))
 				{
@@ -202,16 +212,17 @@ namespace ft {
 						_rightRotation(parent->rightChild->leftChild, parent->rightChild);
 						_leftRotation(parent->rightChild, parent);
 					}
-				} else if (!(case_flag & NEPHEW_R_IS_RED) && !(case_flag & NEPHEW_L_IS_RED)) {
+				} else if (!(case_flag & NEPHEW_R_IS_RED) && !(case_flag & NEPHEW_L_IS_RED) && (case_flag & SIBLING_IS_RED) == 0) {
+					//c la que tu commence a tester
 					if ((case_flag & SIBLING_IS_L) == SIBLING_IS_L)
 						parent->leftChild->color = RED;
-					else if ((case_flag & SIBLING_IS_R) == SIBLING_IS_L)
+					else if ((case_flag & SIBLING_IS_R) == SIBLING_IS_R)
 						parent->rightChild->color = RED;
 					if (parent->color == BLACK)
-						_XtremRotateStreamMultiThreadedTree(parent, parent->parent);
+						_fixDoubleBlack(parent, parent->parent);
 					else
 						parent->color = BLACK;
-				} else if ((case_flag & SIBLING_IS_RED) == 1) {
+				} else if ((case_flag & SIBLING_IS_RED) == SIBLING_IS_RED) {
 						parent->color = RED;
 						if ((case_flag & SIBLING_IS_R) == SIBLING_IS_R) {
 							parent->rightChild->color = BLACK;
@@ -220,7 +231,8 @@ namespace ft {
 							parent->leftChild->color = BLACK;
 							_rightRotation(parent->leftChild, parent);
 						}
-						_XtremRotateStreamMultiThreadedTree(tmp, parent);
+						 std::cout << "ICI OU LAS BAS -->" << BN;
+						_fixDoubleBlack(tmp, parent);
 				}
 			}
 
