@@ -24,6 +24,11 @@
 
 namespace ft {
 
+
+	/*  ------------------ MY_MAP --------------------  */
+	template <typename T>
+	class	binary_tree_iterator;
+
 	template< class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<ft::pair<const Key, T> > >
 		class map {
 			public :
@@ -41,23 +46,21 @@ namespace ft {
 			typedef				const value_type&						const_reference;
 			typedef	typename	Allocator::pointer						pointer;
 			typedef	typename	Allocator::const_pointer				const_pointer;
-			// typedef	typename	binaryTreeIterator<value_type>			iterator;
-			// typedef	typename	binaryTreeIterator<const value_type>	const_iterator;
+			typedef				binary_tree_iterator<value_type>		iterator;
+			typedef				binary_tree_iterator<const value_type>	const_iterator;
 			// typedef	typename	ft::reverse_iterator<iterator>			reverse_iterator;
 			// typedef	typename	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 			typedef struct node {
+				node() : color(BLACK), data(NULL), parent(NULL), rightChild(NULL), leftChild(NULL){	}
+				node(map::pointer new_data, node* p, node* r, node* l, bool c) : color(c), data(new_data), parent(p), rightChild(r), leftChild(l) {	}
+				~node() {}
 
-			node() : color(BLACK), data(NULL), parent(NULL), rightChild(NULL), leftChild(NULL){	}
-			node(map::pointer new_data, node* p, node* r, node* l, bool c) : color(c), data(new_data), parent(p), rightChild(r), leftChild(l) {	}
-			~node() {}
-
-			bool	color;
-			pointer data;
-			node*	parent;
-			node*	rightChild;
-			node*	leftChild;
-
+				bool	color;
+				pointer data;
+				node*	parent;
+				node*	rightChild;
+				node*	leftChild;
 			} node;
 
 			/*  -------------  Constructors  -----------------------------------*/
@@ -96,8 +99,25 @@ namespace ft {
 				// return (ft::make_pair<>)
 			}
 
+			/* ------------------  Iterators stuff  ---------------------- */
 
+			iterator		begin() {
+				if (this->size()) {
+					return (iterator(this->_findLowestVal(this->_head), this->_leaf));
+				}
+				return (iterator());
+			}
 
+			const_iterator	begin() const {
+				if (this->size()) {
+					return (const_iterator(this->_findLowestVal(this->_head), this->_leaf));
+				}
+				return (const_iterator());
+			}
+
+			iterator		end() {
+				return (iterator(this->_leaf, this->_leaf));
+			}
 			void	erase(const value_type& val) {
 				node*	rm			= _search(this->_head, val);//_dive(_head, val, isbigger, isOk);
 				node*	substitute	= NULL;
@@ -312,6 +332,14 @@ namespace ft {
 					return (root);
 			}
 
+			node*	_findLowestVal(node* root) {
+				if (root->leftChild != this->_leaf)
+					return (_findLowestVal(root->leftChild));
+				else
+					return (root);
+			}
+
+
 			void	_balance(node* child){
 				node* parent = _getUp(child);
 				node* gParent = _getUp(parent);
@@ -454,8 +482,110 @@ namespace ft {
 			size_type		_size;
 			size_type		_capacity;
 			key_compare		_compAlgo;
+	};
 
+		/*  ------------------ MY_ITERATOR ------------------  */
 
+	template <typename T>
+	class	binary_tree_iterator : public std::iterator<std::bidirectional_iterator_tag, T, std::ptrdiff_t, T*, T&> {
+
+		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::pointer			pointer;
+		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::difference_type	difference_type;
+		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::value_type		value_type;
+		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::reference		reference;
+		typedef typename ft::map<typename remove_cv<typename T::first_type>::type, typename T::second_type>::node*	node_type;
+		// typedef typename ft::map<int, int>::node*							node_type;
+
+		//typedef typename std::iterator
+		public :
+		binary_tree_iterator() : _location(NULL) {  /*  nothing to put for the moment  */  }
+
+		binary_tree_iterator(node_type start_addr, node_type leaf) {
+			this->_location = start_addr;
+			this->_leaf = leaf;
+		}
+
+		template <typename U>
+		binary_tree_iterator(const binary_tree_iterator<U> & itToCopy) {
+			*this = itToCopy;
+		}
+
+		template <typename U>
+		binary_tree_iterator const & operator=(binary_tree_iterator<U> const & itToAssign) {
+			this->_location = itToAssign.operator->();
+			return (*this);
+		}
+
+		/*  -----------  == && != -----------  */
+
+		template <typename U>
+		bool		operator==(binary_tree_iterator<U> const & itToComp) {
+			return (_location == itToComp.operator->());
+		}
+
+		template <typename U>
+		bool		operator!=(binary_tree_iterator<U> const & itToComp) {
+			return (_location != itToComp._location);
+		}
+
+		/*  -----------  * && -> -----------  */
+
+		reference	operator*( void ) const {
+			return (*(_location->data));
+		}
+
+		pointer	operator->( void ) const {
+			return (_location->data);
+		};
+
+		/*  ---------------- ++ && -- --------------*/
+
+		binary_tree_iterator & operator++( void ){
+
+			if (this->_location->rightChild != this->_leaf)
+			{
+				if (this->_location->data->first == 1245)
+					std::cout << "******************\n\n";
+				this->_location = this->_location->rightChild;
+				while(this->_location->leftChild != this->_leaf)
+					this->_location = this->_location->leftChild;
+				return (*this);
+			}
+			else
+			{
+				if (this->_location->rightChild == this->_leaf && this->_leaf->parent == this->_location) {
+					this->_location = this->_leaf;
+					return (*this);
+				}
+
+				while (this->_location->parent && this->_location == this->_location->parent->rightChild){
+					this->_location = this->_location->parent;
+				}
+				this->_location = this->_location->parent;
+				return (*this);
+			}
+		}
+
+		// binary_tree_iterator	operator++( int ) {
+			// binary_tree_iterator	temp = *this;
+			// _location++;
+			// return (temp);
+		// }
+//
+		// binary_tree_iterator & operator--( void ){
+			// _location--;
+			// return (*this);
+		// }
+//
+		// binary_tree_iterator	operator--( int ) {
+			// binary_tree_iterator	temp = *this;
+			// _location--;
+			// return (temp);
+		// }
+
+		private :
+		node_type	_location;
+		node_type	_leaf;
 	};
 }
 
