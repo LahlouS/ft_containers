@@ -48,16 +48,34 @@ int main(void){
 	testVrai.insert(std::make_pair(1245, 0));
 	testVrai.insert(std::make_pair(-104, 0));
 
+	testVrai.erase(23);
+	test.erase(23);
 
-	//std::map<int, int>::iterator itVrai = testVrai.begin();
-	ft::map<int, int>::iterator it = test.begin();
-
+	ft::map<int, int>::iterator it = test.end();
+	std::map<int, int>::iterator itVrai = testVrai.end();
+	--itVrai;
+	--it;
+	std::cout << itVrai->first << " " << it->first << BN << BN;
 	std::cout << "V\tPV" << BN;
-	for (;it != test.end();) {
-		std::cout << it->first << BN;
-		++it;
+	for (;itVrai != testVrai.begin();) {
+		std::cout << itVrai->first << " " << it->first << BN;
+		--itVrai;
+		--it;
 	}
-
+	std::cout << "." << (itVrai)->first << " " << it->first << BN;
+	--itVrai;
+	--it;
+	itVrai++;
+	it++;
+	itVrai++;
+	it++;
+	itVrai++;
+	it++;
+	itVrai++;
+	it++;
+	itVrai++;
+	it++;
+	std::cout << "LA ->> " << (itVrai)->first << " " << it->first << BN;
 	return (0);
 }
 

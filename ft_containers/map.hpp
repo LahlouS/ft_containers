@@ -68,11 +68,13 @@ namespace ft {
 			map() : _head(NULL), _size(0), _capacity(0) {
 				_leaf = new node;
 				_head = _leaf;
+				_leaf->leftChild = _leaf->rightChild = NULL;
 			}
 
 			explicit map( const Compare& comp, const Allocator& alloc = Allocator() ) : _head(NULL), _size(0), _capacity(0), _compAlgo(comp), _mhandle(alloc) {
 				_leaf = new node;
 				_head = _leaf;
+				_leaf->leftChild = _leaf->rightChild = NULL;
 			}
 
 			~map() {
@@ -118,6 +120,11 @@ namespace ft {
 			iterator		end() {
 				return (iterator(this->_leaf, this->_leaf));
 			}
+
+			void	erase(const key_type &val) {
+				this->erase(ft::make_pair<key_type, bool>(val, 0));
+			}
+
 			void	erase(const value_type& val) {
 				node*	rm			= _search(this->_head, val);//_dive(_head, val, isbigger, isOk);
 				node*	substitute	= NULL;
@@ -541,47 +548,60 @@ namespace ft {
 		/*  ---------------- ++ && -- --------------*/
 
 		binary_tree_iterator & operator++( void ){
-
-			if (this->_location->rightChild != this->_leaf)
+			if (this->_location->rightChild != this->_leaf && this->_location != this->_leaf)
 			{
-				if (this->_location->data->first == 1245)
-					std::cout << "******************\n\n";
 				this->_location = this->_location->rightChild;
 				while(this->_location->leftChild != this->_leaf)
 					this->_location = this->_location->leftChild;
 				return (*this);
-			}
-			else
-			{
+			} else {
 				if (this->_location->rightChild == this->_leaf && this->_leaf->parent == this->_location) {
 					this->_location = this->_leaf;
 					return (*this);
 				}
 
-				while (this->_location->parent && this->_location == this->_location->parent->rightChild){
+				while (this->_location->parent && this->_location == this->_location->parent->rightChild && this->_location != this->_location->parent->leftChild){
 					this->_location = this->_location->parent;
 				}
-				this->_location = this->_location->parent;
+				if (this->_location->parent)
+					this->_location = this->_location->parent;
 				return (*this);
 			}
 		}
 
-		// binary_tree_iterator	operator++( int ) {
-			// binary_tree_iterator	temp = *this;
-			// _location++;
-			// return (temp);
-		// }
-//
-		// binary_tree_iterator & operator--( void ){
-			// _location--;
-			// return (*this);
-		// }
-//
-		// binary_tree_iterator	operator--( int ) {
-			// binary_tree_iterator	temp = *this;
-			// _location--;
-			// return (temp);
-		// }
+		binary_tree_iterator	operator++( int ) {
+			binary_tree_iterator	temp = *this;
+			++(*this);
+			return (temp);
+		}
+
+		binary_tree_iterator & operator--( void ){
+			if (this->_location->leftChild && this->_location->rightChild && this->_location->leftChild != this->_leaf)
+			{
+				this->_location = this->_location->leftChild;
+				while (this->_location->rightChild != this->_leaf)
+					this->_location = this->_location->rightChild;
+				return (*this);
+			} else {
+				while (this->_location->parent && this->_location == this->_location->parent->leftChild && this->_location != this->_location->parent->rightChild)
+					this->_location = this->_location->parent;
+				if (this->_location->parent)
+					this->_location = this->_location->parent;
+				else
+					this->_location = this->_leaf;
+				return (*this);
+			}
+		}
+
+		binary_tree_iterator	operator--( int ) {
+			binary_tree_iterator	temp = *this;
+			--(*this);
+			return (temp);
+		}
+
+		node_type	data(void) {
+			return (_location);
+		}
 
 		private :
 		node_type	_location;
