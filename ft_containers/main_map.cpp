@@ -48,34 +48,22 @@ int main(void){
 	testVrai.insert(std::make_pair(1245, 0));
 	testVrai.insert(std::make_pair(-104, 0));
 
-	testVrai.erase(23);
-	test.erase(23);
 
-	ft::map<int, int>::iterator it = test.end();
-	std::map<int, int>::iterator itVrai = testVrai.end();
-	--itVrai;
-	--it;
-	std::cout << itVrai->first << " " << it->first << BN << BN;
-	std::cout << "V\tPV" << BN;
-	for (;itVrai != testVrai.begin();) {
-		std::cout << itVrai->first << " " << it->first << BN;
-		--itVrai;
-		--it;
+
+	std::map<int, int>::const_reverse_iterator ritVrai = testVrai.rbegin();
+	ft::map<int, int>::const_reverse_iterator rit = test.rbegin();
+
+	while (ritVrai != testVrai.rend()) {
+		std::cout << ritVrai->first << BN;
+		ritVrai++;
 	}
-	std::cout << "." << (itVrai)->first << " " << it->first << BN;
-	--itVrai;
-	--it;
-	itVrai++;
-	it++;
-	itVrai++;
-	it++;
-	itVrai++;
-	it++;
-	itVrai++;
-	it++;
-	itVrai++;
-	it++;
-	std::cout << "LA ->> " << (itVrai)->first << " " << it->first << BN;
+	std::cout << BN;
+	while (rit != test.rend()) {
+		std::cout << rit->first << " ";
+		rit++;
+	}
+	std::cout << BN;
+
 	return (0);
 }
 
@@ -118,3 +106,33 @@ int main(void){
 	// test.erase(ft::make_pair(1245, 0));
 //
 	// test.printBT();
+
+
+	// testVrai.erase(23);
+	// test.erase(23);
+
+	// ft::map<int, int>::iterator it = test.end();
+	// std::map<int, int>::iterator itVrai = testVrai.end();
+	// --itVrai;
+	// --it;
+	// std::cout << itVrai->first << " " << it->first << BN << BN;
+	// std::cout << "V\tPV" << BN;
+	// for (;itVrai != testVrai.begin();) {
+	// 	std::cout << itVrai->first << " " << it->first << BN;
+	// 	--itVrai;
+	// 	--it;
+	// }
+	// std::cout << "." << (itVrai)->first << " " << it->first << BN;
+	// --itVrai;
+	// --it;
+	// itVrai++;
+	// it++;
+	// itVrai++;
+	// it++;
+	// itVrai++;
+	// it++;
+	// itVrai++;
+	// it++;
+	// itVrai++;
+	// it++;
+	// std::cout << "LA ->> " << (itVrai)->first << " " << it->first << BN;

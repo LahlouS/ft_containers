@@ -48,8 +48,8 @@ namespace ft {
 			typedef	typename	Allocator::const_pointer				const_pointer;
 			typedef				binary_tree_iterator<value_type>		iterator;
 			typedef				binary_tree_iterator<const value_type>	const_iterator;
-			// typedef	typename	ft::reverse_iterator<iterator>			reverse_iterator;
-			// typedef	typename	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+			typedef	typename	ft::reverse_iterator<iterator>			reverse_iterator;
+			typedef	typename	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 			typedef struct node {
 				node() : color(BLACK), data(NULL), parent(NULL), rightChild(NULL), leftChild(NULL){	}
@@ -117,9 +117,27 @@ namespace ft {
 				return (const_iterator());
 			}
 
-			iterator		end() {
+			iterator		end(void) {
 				return (iterator(this->_leaf, this->_leaf));
 			}
+
+			reverse_iterator rbegin(void) {
+				return (reverse_iterator(this->end()));
+			}
+
+			const_reverse_iterator rbegin(void) const {
+				return (const_reverse_iterator(this->end()));
+			}
+
+			reverse_iterator rend(void) {
+				return (reverse_iterator(this->begin()));
+			}
+
+			const_reverse_iterator rend() const{
+				return (const_reverse_iterator(this->begin()));
+			}
+
+			/*  ----------------------- Modifiers -------------------------  */
 
 			void	erase(const key_type &val) {
 				this->erase(ft::make_pair<key_type, bool>(val, 0));
@@ -495,17 +513,17 @@ namespace ft {
 
 	template <typename T>
 	class	binary_tree_iterator : public std::iterator<std::bidirectional_iterator_tag, T, std::ptrdiff_t, T*, T&> {
+		public :
 
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::pointer			pointer;
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::difference_type	difference_type;
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::value_type		value_type;
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::reference		reference;
 		typedef typename ft::map<typename remove_cv<typename T::first_type>::type, typename T::second_type>::node*	node_type;
-		// typedef typename ft::map<int, int>::node*							node_type;
 
-		//typedef typename std::iterator
-		public :
-		binary_tree_iterator() : _location(NULL) {  /*  nothing to put for the moment  */  }
+		/*  -------------------- iterators Constructors ----------------------*/
+
+		binary_tree_iterator() : _location(NULL), _leaf(NULL) {  /*  nothing to put for the moment  */  }
 
 		binary_tree_iterator(node_type start_addr, node_type leaf) {
 			this->_location = start_addr;
@@ -519,7 +537,8 @@ namespace ft {
 
 		template <typename U>
 		binary_tree_iterator const & operator=(binary_tree_iterator<U> const & itToAssign) {
-			this->_location = itToAssign.operator->();
+			this->_location = itToAssign.data();
+			this->_leaf = itToAssign.data2();
 			return (*this);
 		}
 
@@ -532,7 +551,7 @@ namespace ft {
 
 		template <typename U>
 		bool		operator!=(binary_tree_iterator<U> const & itToComp) {
-			return (_location != itToComp._location);
+			return (this->_location != itToComp._location);
 		}
 
 		/*  -----------  * && -> -----------  */
@@ -576,6 +595,7 @@ namespace ft {
 		}
 
 		binary_tree_iterator & operator--( void ){
+
 			if (this->_location->leftChild && this->_location->rightChild && this->_location->leftChild != this->_leaf)
 			{
 				this->_location = this->_location->leftChild;
@@ -601,6 +621,18 @@ namespace ft {
 
 		node_type	data(void) {
 			return (_location);
+		}
+
+		node_type	data(void) const {
+			return (_location);
+		}
+
+		node_type	data2(void) const {
+			return (_leaf);
+		}
+
+		node_type	data2(void) {
+			return (_leaf);
 		}
 
 		private :
