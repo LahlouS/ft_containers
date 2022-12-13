@@ -118,6 +118,9 @@ int main(void){
 	std::cout << "it2" << "\t" << "itVrai2" << BN;
 	for (; it2 != test2.end(); it2++, itVrai2++)
 		std::cout << it2->first << "\t" << itVrai2->first << BN;
+
+	if (itVrai2 == testVrai2.end())
+		std::cout << "oui\n";
 	return (0);
 }
 
