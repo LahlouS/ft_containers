@@ -54,16 +54,70 @@ int main(void){
 	ft::map<int, int>::const_reverse_iterator rit = test.rbegin();
 
 	while (ritVrai != testVrai.rend()) {
-		std::cout << ritVrai->first << BN;
+		std::cout << ritVrai->first << "\t";
 		ritVrai++;
 	}
 	std::cout << BN;
 	while (rit != test.rend()) {
-		std::cout << rit->first << " ";
+		std::cout << rit->first << "\t";
 		rit++;
 	}
 	std::cout << BN;
+	ritVrai--;
+	rit--;
 
+	// ritVrai->second = 89; // will not compile while iterators are const_reverse
+	// rit->second = 89; // will not compile while iterators are const_reverse
+
+	while (ritVrai != testVrai.rbegin()) {
+		std::cout << ritVrai->second << "\t";
+		ritVrai--;
+	}
+	std::cout << BN;
+	while (rit != test.rbegin()) {
+		std::cout << rit->second << "\t";
+		rit--;
+	}
+	std::cout << BN << BN;
+	std::cout << "some test on different insert functions : " << BN;
+	std::cout << "first to last iterators insertion :\n";
+	ft::map<int, int> test2;
+	std::map<int, int> testVrai2;
+
+	test2.insert(test.begin(), test.end());
+	testVrai2.insert(testVrai.begin(), testVrai.end());
+
+	ft::map<int, int>::iterator it2 = test2.begin();
+	std::map<int, int>::iterator itVrai2 = testVrai2.begin();
+
+	std::cout << "it2" << "\t" << "itVrai2" << BN;
+	for (; it2 != test2.end(); it2++, itVrai2++) {
+		std::cout << it2->first << "\t" << itVrai2->first << BN;
+	}
+	std::cout << BN;
+	std::cout << "check return value of  'pair<iterator,bool> insert (const value_type& val)' :\n";
+
+	std::cout << "testVrai2.insert(std::make_pair(788456, 0)).second -> " << testVrai2.insert(std::make_pair(788456, 0)).second << BN;
+	std::cout << "test2.insert(ft::make_pair(788456, 0)).second -> " << test2.insert(ft::make_pair(788456, 0)).second << BN;
+
+	std::cout << "testVrai2.insert(std::make_pair(788456, 0)).first->first -> " << testVrai2.insert(std::make_pair(788456, 0)).first->first << BN;
+	std::cout << "test2.insert(ft::make_pair(788456, 0)).first->first -> " << test2.insert(ft::make_pair(788456, 0)).first->first << BN << BN;
+
+	std::cout << "same but with a key_value that already exist : \n";
+	std::cout << "testVrai2.insert(std::make_pair(100, 0)).second -> " << testVrai2.insert(std::make_pair(100, 0)).second << BN;
+	std::cout << "test2.insert(ft::make_pair(100, 0)).second -> " << test2.insert(ft::make_pair(100, 0)).second << BN;
+
+	std::cout << "testVrai2.insert(std::make_pair(100, 0)).first->first -> " << testVrai2.insert(std::make_pair(100, 0)).first->first << BN;
+	std::cout << "test2.insert(ft::make_pair(100, 0)).first->first -> " << test2.insert(ft::make_pair(100, 0)).first->first << BN;
+
+	std::cout << "Now printing all values to be sure we are all good :\n";
+
+	it2 = test2.begin();
+	itVrai2 = testVrai2.begin();
+
+	std::cout << "it2" << "\t" << "itVrai2" << BN;
+	for (; it2 != test2.end(); it2++, itVrai2++)
+		std::cout << it2->first << "\t" << itVrai2->first << BN;
 	return (0);
 }
 

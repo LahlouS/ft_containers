@@ -83,24 +83,6 @@ namespace ft {
 				delete _leaf;
 			}
 
-			size_type	size() const {
-				return (this->_size);
-			}
-			// ft::pair<iterator,bool> insert (const value_type& val) {
-			void	insert (const value_type& val) {
-				node*	ret = NULL;
-				bool	isbigger = 1;
-				bool	isOk	 = 1;
-				if (this->_head != _leaf)
-					ret = this->_dive(_head, val, isbigger, isOk);
-				else
-					ret = this->_head = _insertNewElement(NULL, val, BLACK);
-				if (isOk)
-					this->_size += 1;
-				//std::cout << "---> key : " << ret->data->first << " isBigger" << isbigger << " isOk " << isOk << BN;
-				// return (ft::make_pair<>)
-			}
-
 			/* ------------------  Iterators stuff  ---------------------- */
 
 			iterator		begin() {
@@ -139,6 +121,8 @@ namespace ft {
 
 			/*  ----------------------- Modifiers -------------------------  */
 
+
+
 			void	erase(const key_type &val) {
 				this->erase(ft::make_pair<key_type, bool>(val, 0));
 			}
@@ -165,19 +149,56 @@ namespace ft {
 					std::cout << "no key found matching with : " << val.first << BN;
 			}
 
-			/* Insert prototypes :
-			iterator insert (iterator position, const value_type& val) {
 
+			ft::pair<iterator,bool> insert (const value_type& val) {
+				node*	ret = NULL;
+				bool	isbigger = 1;
+				bool	isOk	 = 1;
+				if (this->_head != _leaf)
+					ret = this->_dive(_head, val, isbigger, isOk);
+				else
+					ret = this->_head = _insertNewElement(NULL, val, BLACK);
+				if (isOk)
+					this->_size += 1;
+				return (ft::make_pair<iterator, bool>(iterator(ret, this->_leaf), isOk));
+			}
+
+			//Insert
+			iterator insert (iterator position, const value_type& val) {
+				node*	ret = NULL;
+				bool	isbigger = 1;
+				bool	isOk	 = 1;
+				if (position.data() != _leaf)
+					ret = this->_dive(position.data(), val, isbigger, isOk);
+				else {
+					ret = position.data();
+					isOk = 0;
+				}
+				if (isOk)
+					this->_size += 1;
+				return (iterator(ret, this->_leaf));
 			}
 
 			template <class InputIterator>
-			void insert (InputIterator first, InputIterator last) {
+			void insert (InputIterator first, InputIterator last, typename enable_if< !is_integral<InputIterator>::value, int>::type = 0) {
+				while (first != last){
+					insert(*first);
+					first++;
+				}
+			}
 
-			}*/
+			/*  ----------------------- Accessor ------------------------------*/
+
+			size_type	size() const {
+				return (this->_size);
+			}
+
+
+			/* -------------------------- RBtree visualiser ---------------------- */
+
 
 			void printBT() {
 				printBT("", this->_head, false);
-				std::cout << " ---> the bigger is : " << this->_leaf->parent->data->first << BN;
 			}
 
 		private :
@@ -551,7 +572,7 @@ namespace ft {
 
 		template <typename U>
 		bool		operator!=(binary_tree_iterator<U> const & itToComp) {
-			return (this->_location != itToComp._location);
+			return (this->_location != itToComp.data());
 		}
 
 		/*  -----------  * && -> -----------  */
