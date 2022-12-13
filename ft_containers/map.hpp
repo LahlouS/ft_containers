@@ -64,17 +64,26 @@ namespace ft {
 			} node;
 
 			/*  -------------  Constructors  -----------------------------------*/
-
-			map() : _head(NULL), _size(0), _capacity(0) {
+			explicit map( const Compare& comp = key_compare(), const Allocator& alloc = Allocator() ) : _mhandle(alloc), _head(NULL), _size(0), _capacity(0), _compAlgo(comp) {
 				_leaf = new node;
 				_head = _leaf;
 				_leaf->leftChild = _leaf->rightChild = NULL;
 			}
 
-			explicit map( const Compare& comp, const Allocator& alloc = Allocator() ) : _head(NULL), _size(0), _capacity(0), _compAlgo(comp), _mhandle(alloc) {
+			map (const map& x) : _head(NULL), _size(0), _capacity(0) {
 				_leaf = new node;
-				_head = _leaf;
 				_leaf->leftChild = _leaf->rightChild = NULL;
+				_head = _leaf;
+				*this = x;
+			}
+
+			map&	operator=(const map& x) {
+				std::cout << "je passe ici****************" << BN;
+				if (this->_head != this->_leaf)
+					this->_freeTree(this->_head);
+				_head = _leaf;
+				this->insert(x.begin(), x.end());
+				return (*this);
 			}
 
 			~map() {
@@ -103,6 +112,11 @@ namespace ft {
 				return (iterator(this->_leaf, this->_leaf));
 			}
 
+			const_iterator		end(void) const {
+				return (const_iterator(this->_leaf, this->_leaf));
+			}
+
+
 			reverse_iterator rbegin(void) {
 				return (reverse_iterator(this->end()));
 			}
@@ -122,34 +136,24 @@ namespace ft {
 			/*  ----------------------- Modifiers -------------------------  */
 
 
-
-			void	erase(const key_type &val) {
-				this->erase(ft::make_pair<key_type, bool>(val, 0));
+			void		erase(iterator first, iterator last) {
+				int i = 1;
+				while (first != last) {
+					this->_erase(*first);
+					++first;
+					std::cout << i++ << BN;
+				}
 			}
 
-			void	erase(const value_type& val) {
-				node*	rm			= _search(this->_head, val);//_dive(_head, val, isbigger, isOk);
-				node*	substitute	= NULL;
-
-				if (this->_head == this->_leaf || !this->_size)
-					return ;
-				if (rm) {
-					substitute = _find_subsitute(rm);
-					node *legacy = _transplant(rm, substitute);
-					if (substitute->color == BLACK && legacy->color == BLACK && substitute != this->_head) // meaning double black shit
-						_fixDoubleBlack(legacy, substitute->parent);
-					else
-						legacy->color = BLACK;
-					if (substitute == this->_head)
-						this->_head = this->_leaf;
-					delete substitute;
-					this->_size -= 1;
-					this->_leaf->parent = _findBiggestVal(this->_head);
-				} else
-					std::cout << "no key found matching with : " << val.first << BN;
+			void		erase (iterator position) {
+				this->_erase(*position);
 			}
 
+			size_type	erase(const key_type &val) {
+				return (this->_erase(ft::make_pair<key_type, bool>(val, 0)));
+			}
 
+			//Insert
 			ft::pair<iterator,bool> insert (const value_type& val) {
 				node*	ret = NULL;
 				bool	isbigger = 1;
@@ -163,17 +167,16 @@ namespace ft {
 				return (ft::make_pair<iterator, bool>(iterator(ret, this->_leaf), isOk));
 			}
 
-			//Insert
 			iterator insert (iterator position, const value_type& val) {
 				node*	ret = NULL;
 				bool	isbigger = 1;
 				bool	isOk	 = 1;
-				if (position.data() != _leaf)
-					ret = this->_dive(position.data(), val, isbigger, isOk);
-				else {
-					ret = position.data();
-					isOk = 0;
-				}
+
+				(void)position;
+				if (this->_head != _leaf)
+					ret = this->_dive(_head, val, isbigger, isOk);
+				else
+					ret = this->_head = _insertNewElement(NULL, val, BLACK);
 				if (isOk)
 					this->_size += 1;
 				return (iterator(ret, this->_leaf));
@@ -202,6 +205,29 @@ namespace ft {
 			}
 
 		private :
+
+			size_type	_erase(const value_type& val) {
+				node*	rm			= _search(this->_head, val);
+				node*	substitute	= NULL;
+
+				if (this->_head == this->_leaf || !this->_size )
+					return (0);
+				if (rm) {
+					substitute = _find_subsitute(rm);
+					node *legacy = _transplant(rm, substitute);
+					if (substitute->color == BLACK && legacy->color == BLACK && substitute != this->_head) // meaning double black shit
+						_fixDoubleBlack(legacy, substitute->parent);
+					else
+						legacy->color = BLACK;
+					if (substitute == this->_head)
+						this->_head = this->_leaf;
+					delete substitute;
+					this->_size -= 1;
+					this->_leaf->parent = _findBiggestVal(this->_head);
+					return (1);
+				} else
+					return (0);
+			}
 
 			node*	_search(node* root, value_type const & val) {
 				if (root == this->_leaf)
@@ -378,7 +404,7 @@ namespace ft {
 					return (root);
 			}
 
-			node*	_findLowestVal(node* root) {
+			node*	_findLowestVal(node* root) const {
 				if (root->leftChild != this->_leaf)
 					return (_findLowestVal(root->leftChild));
 				else

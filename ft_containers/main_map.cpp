@@ -119,8 +119,42 @@ int main(void){
 	for (; it2 != test2.end(); it2++, itVrai2++)
 		std::cout << it2->first << "\t" << itVrai2->first << BN;
 
-	if (itVrai2 == testVrai2.end())
-		std::cout << "oui\n";
+	std::cout << "\n\nNow testing the function that start with given position iterator :\n";
+	std::cout << test2.size() << " size\n";
+	std::cout << testVrai2.size() << " Vrai size\n";
+	std::cout << "testVrai2.insert(itVrai2, std::make_pair(899000, 0)) : " << testVrai2.insert(itVrai2, std::make_pair(899000, 0))->first << BN;
+	std::cout << "test2.insert(itVrai2, std::make_pair(899000, 0)) : " << test2.insert(it2, ft::make_pair(899000, 0))->first << BN;
+	std::cout << test2.size() << " size\n";
+	std::cout << testVrai2.size() << " Vrai size\n";
+
+	std::cout << "testVrai2.insert(itVrai2, std::make_pair(53, 0)) : " << testVrai2.insert(testVrai2.begin(), std::make_pair(53, 0))->first << BN;
+	std::cout << "test2.insert(itVrai2, std::make_pair(53, 0)) : " << test2.insert(test2.begin(), ft::make_pair(53, 0))->first << BN;
+	std::cout << test2.size() << " size\n";
+	std::cout << testVrai2.size() << " VraiSize\n";
+
+
+	it2 = test2.begin();
+	itVrai2 = testVrai2.begin();
+
+	std::cout << "Now printing all values to be sure we are all good :\n";
+	std::cout << "it2" << "\t" << "itVrai2" << BN;
+	for (; it2 != test2.end(); it2++, itVrai2++)
+		std::cout << it2->first << "\t" << itVrai2->first << BN;
+	std::cout << test2.size() << " size\n";
+	std::cout << testVrai2.size() << " VraiSize\n";
+
+	std::cout << "***************** Now testing erase function :********************\n";
+	std::cout << test2.erase(4) << " is return after erasing 4 (test2)\n";
+	std::cout << testVrai2.erase(4) << " is return after erasing 4 (testVrai2)\n\n";
+
+	std::map<int, int> cpyVrai = testVrai2;
+	ft::map<int, int> cpy = test2;
+
+	std::cout << test2.size() << " la size avant le erase" << BN;
+	test2.erase(test2.begin(), test2.end());
+	testVrai2.erase(testVrai2.begin(), testVrai2.end());
+	std::cout << test2.size() << " is size after erasing all (test2)\n";
+	std::cout << testVrai2.size() << " is size after erasing all (testVrai2)\n";
 	return (0);
 }
 
