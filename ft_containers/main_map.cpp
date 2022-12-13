@@ -149,9 +149,11 @@ int main(void){
 
 	std::map<int, int> cpyVrai = testVrai2;
 	ft::map<int, int> cpy = test2;
-
+	ft::map<int, int>::iterator iter = test2.end();
+	iter--;
+	iter--;
 	std::cout << test2.size() << " la size avant le erase" << BN;
-	test2.erase(test2.begin(), test2.end());
+	test2.erase(test2.begin(), iter);
 	testVrai2.erase(testVrai2.begin(), testVrai2.end());
 	std::cout << test2.size() << " is size after erasing all (test2)\n";
 	std::cout << testVrai2.size() << " is size after erasing all (testVrai2)\n";
