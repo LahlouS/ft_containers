@@ -5,6 +5,8 @@
 #include "traits_utils_pair.hpp"
 #include <cstdlib>
 #include <iostream>
+#include <exception>
+#include <stdexcept>
 
 #define BN "\n"
 
@@ -63,6 +65,20 @@ namespace ft {
 				node*	leftChild;
 			} node;
 
+			class value_compare {
+					friend class map;
+				protected:
+					Compare comp;
+					value_compare (Compare c) : comp(c) {}  // constructed with map's comparison object
+				public:
+					typedef bool result_type;
+					typedef value_type first_argument_type;
+					typedef value_type second_argument_type;
+					bool operator() (const value_type& x, const value_type& y) const {
+						return comp(x.first, y.first);
+					}
+			};
+
 			/*  -------------  Constructors  -----------------------------------*/
 			explicit map( const Compare& comp = key_compare(), const Allocator& alloc = Allocator() ) : _mhandle(alloc), _head(NULL), _size(0), _capacity(0), _compAlgo(comp) {
 				_leaf = new node;
@@ -76,10 +92,18 @@ namespace ft {
 				_head = _leaf;
 				*this = x;
 			}
+			template <class InputIterator>
+			map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _mhandle(alloc), _head(NULL), _size(0), _capacity(0), _compAlgo(comp) {
+				_leaf = new node;
+				_head = _leaf;
+				_leaf->leftChild = _leaf->rightChild = NULL;
+				this->insert(first, last);
+			}
 
 			map&	operator=(const map& x) {
 				if (this->_head != this->_leaf)
 					this->_freeTree(this->_head);
+				this->_size = 0;
 				_head = _leaf;
 				this->insert(x.begin(), x.end());
 				return (*this);
@@ -94,17 +118,11 @@ namespace ft {
 			/* ------------------  Iterators stuff  ---------------------- */
 
 			iterator		begin() {
-				if (this->size()) {
 					return (iterator(this->_findLowestVal(this->_head), this->_leaf));
-				}
-				return (iterator());
 			}
 
 			const_iterator	begin() const {
-				if (this->size()) {
 					return (const_iterator(this->_findLowestVal(this->_head), this->_leaf));
-				}
-				return (const_iterator());
 			}
 
 			iterator		end(void) {
@@ -151,14 +169,17 @@ namespace ft {
 			}
 
 			//Insert
-			ft::pair<iterator,bool> insert (const value_type& val) {
+			ft::pair<iterator,bool> insert(const value_type& val) {
 				node*	ret = NULL;
 				bool	isbigger = 1;
 				bool	isOk	 = 1;
 				if (this->_head != _leaf)
 					ret = this->_dive(_head, val, isbigger, isOk);
 				else
+				{
 					ret = this->_head = _insertNewElement(NULL, val, BLACK);
+					this->_leaf->parent = this->_head;
+				}
 				if (isOk)
 					this->_size += 1;
 				return (ft::make_pair<iterator, bool>(iterator(ret, this->_leaf), isOk));
@@ -187,12 +208,154 @@ namespace ft {
 				}
 			}
 
-			/*  ----------------------- Accessor ------------------------------*/
+			void	clear(void) {
+				if (this->_head != this->_leaf)
+					this->_freeTree(this->_head);
+				this->_head = this->_leaf;
+				this->_leaf->parent = NULL;
+			}
+
+			void swap(map & x) {
+				allocator_type	tmp_mhandle = _mhandle;
+				node*			tmp_head = _head;
+				node*			tmp_leaf = _leaf;
+				size_type		tmp_size = _size;
+				size_type		tmp_capacity = _capacity;
+				key_compare		tmp_compAlgo = _compAlgo;
+
+				this->_mhandle = x._mhandle;
+				this->_head = x._head;
+				this->_leaf = x._leaf;
+				this->_size = x._size;
+				this->_capacity = x._capacity;
+				this->_compAlgo = x._compAlgo;
+
+				x._mhandle = tmp_mhandle;
+				x._head = tmp_head;
+				x._leaf = tmp_leaf;
+				x._size = tmp_size;
+				x._capacity = tmp_capacity;
+				x._compAlgo = tmp_compAlgo;
+			}
+
+			/*  ----------------------- Capacity ------------------------------*/
 
 			size_type	size() const {
 				return (this->_size);
 			}
 
+			bool		empty() const {
+				return ((this->_size == 0));
+			}
+
+			size_type max_size() const {
+				return (_mhandle.max_size());
+			}
+
+			/*  ----------------------- Element Access ------------------------------*/
+
+			mapped_value&	operator[] (const key_type& k) {
+				node* tmp = this->_search(this->_head, k);
+				if (tmp)
+					return (tmp->data->second);
+				else
+					return ( this->insert(this->begin(), ft::make_pair(k, mapped_value()))->second );
+			}
+
+			mapped_value& at(const key_type& k){
+				node* tmp = this->_search(this->_head, k);
+				if (!tmp)
+					throw std::out_of_range("ERREUR: Une erreur a ete detecte entre la chaise et le clavier !");
+				return (tmp->data->second);
+			}
+
+			const mapped_value& at (const key_type& k) const {
+				node* tmp = this->_search(this->_head, k);
+				if (!tmp)
+					throw std::out_of_range("ERREUR: Une erreur a ete detecte entre la chaise et le clavier !");
+				return (tmp->data->second);
+			}
+
+
+			/* -------------------------- observer ---------------------- */
+
+			key_compare key_comp() const {
+				return (this->_compAlgo);
+			}
+			value_compare	value_comp() const {
+				return (value_compare(this->_compAlgo));
+			}
+
+
+			/* -------------------------- Operations ---------------------- */
+
+			iterator find(const key_type& k) {
+				node* tmp = this->_search(this->_head, k);
+				if (tmp)
+					return (iterator(tmp, this->_leaf));
+				return (this->end());
+			}
+
+			const_iterator find (const key_type& k) const {
+				node* tmp = this->_search(this->_head, k);
+				if (tmp)
+					return (const_iterator(tmp, this->_leaf));
+				return (this->end());
+			}
+
+			size_type count (const key_type& k) const {
+				node* tmp = this->_search(this->_head, k);
+				if (tmp)
+					return (1);
+				return (0);
+			}
+
+
+			iterator lower_bound (const key_type& k){
+				iterator it = this->begin();
+				iterator ite = this->end();
+				for (; it != ite;it++)
+					if (!this->_compAlgo(it->first, k))
+						return (it);
+				return (--ite);
+			}
+
+			const_iterator lower_bound (const key_type& k) const {
+				iterator it = this->begin();
+				iterator ite = this->end();
+				for (; it != ite;it++)
+					if (!this->_compAlgo(it->first, k))
+						return (it);
+				return (--ite);
+			}
+
+			iterator upper_bound (const key_type& k) {
+				iterator it = this->begin();
+				iterator ite = this->end();
+				for (; it != ite;it++)
+					if (this->_compAlgo(k, it->first))
+						return (it);
+				return (it);
+			}
+
+			const_iterator upper_bound (const key_type& k) const{
+				iterator it = this->begin();
+				iterator ite = this->end();
+				for (; it != ite;it++)
+					if (this->_compAlgo(k, it->first))
+						return (it);
+				return (it);
+			}
+
+
+			pair<const_iterator,const_iterator> equal_range (const key_type& k) const {
+				return (ft::make_pair<const_iterator, const_iterator>(this->lower_bound(k), this->upper_bound(k)));
+			}
+
+
+			pair<iterator,iterator>	equal_range (const key_type& k) {
+				return (ft::make_pair<iterator, iterator>(this->lower_bound(k), this->upper_bound(k)));
+			}
 
 			/* -------------------------- RBtree visualiser ---------------------- */
 
@@ -204,7 +367,7 @@ namespace ft {
 		private :
 
 			size_type	_erase(const value_type& val) {
-				node*	rm			= _search(this->_head, val);
+				node*	rm			= _search(this->_head, val.first);
 				node*	substitute	= NULL;
 				if (this->_head == this->_leaf || !this->_size )
 					return (0);
@@ -226,12 +389,12 @@ namespace ft {
 					return (0);
 			}
 
-			node*	_search(node* root, value_type const & val) {
+			node*	_search(node* root, key_type const & val) {
 				if (root == this->_leaf)
 					return (NULL);
-				else if (_compAlgo.operator()(root->data->first, val.first))
+				else if (_compAlgo.operator()(root->data->first, val))
 					return (this->_search(root->rightChild, val));
-				else if (_compAlgo.operator()(val.first, root->data->first))
+				else if (_compAlgo.operator()(val, root->data->first))
 					return (this->_search(root->leftChild, val));
 				else
 					return (root);
@@ -402,7 +565,7 @@ namespace ft {
 			}
 
 			node*	_findLowestVal(node* root) const {
-				if (root->leftChild != this->_leaf)
+				if (root != this->_leaf && root->leftChild != this->_leaf)
 					return (_findLowestVal(root->leftChild));
 				else
 					return (root);
@@ -590,7 +753,7 @@ namespace ft {
 
 		template <typename U>
 		bool		operator==(binary_tree_iterator<U> const & itToComp) {
-			return (_location == itToComp.operator->());
+			return (_location == itToComp.data());
 		}
 
 		template <typename U>
@@ -639,7 +802,6 @@ namespace ft {
 		}
 
 		binary_tree_iterator & operator--( void ){
-
 			if (this->_location->leftChild && this->_location->rightChild && this->_location->leftChild != this->_leaf)
 			{
 				this->_location = this->_location->leftChild;
@@ -648,7 +810,9 @@ namespace ft {
 				return (*this);
 			} else {
 				while (this->_location->parent && this->_location == this->_location->parent->leftChild && this->_location != this->_location->parent->rightChild)
+				{
 					this->_location = this->_location->parent;
+				}
 				if (this->_location->parent)
 					this->_location = this->_location->parent;
 				else
