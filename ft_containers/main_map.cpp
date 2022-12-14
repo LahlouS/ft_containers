@@ -133,30 +133,27 @@ int main(void){
 	std::cout << testVrai2.size() << " VraiSize\n";
 
 
-	it2 = test2.begin();
-	itVrai2 = testVrai2.begin();
+	it2 = test.begin();
+	itVrai2 = testVrai.begin();
 
 	std::cout << "Now printing all values to be sure we are all good :\n";
 	std::cout << "it2" << "\t" << "itVrai2" << BN;
-	for (; it2 != test2.end(); it2++, itVrai2++)
+	for (; it2 != test.end(); it2++, itVrai2++)
 		std::cout << it2->first << "\t" << itVrai2->first << BN;
-	std::cout << test2.size() << " size\n";
-	std::cout << testVrai2.size() << " VraiSize\n";
+	std::cout << BN << test.size() << " size\n";
+	std::cout << testVrai.size() << " VraiSize\n\n";
 
 	std::cout << "***************** Now testing erase function :********************\n";
-	std::cout << test2.erase(4) << " is return after erasing 4 (test2)\n";
-	std::cout << testVrai2.erase(4) << " is return after erasing 4 (testVrai2)\n\n";
-
-	std::map<int, int> cpyVrai = testVrai2;
-	ft::map<int, int> cpy = test2;
-	ft::map<int, int>::iterator iter = test2.end();
-	iter--;
-	iter--;
-	std::cout << test2.size() << " la size avant le erase" << BN;
-	test2.erase(test2.begin(), iter);
-	testVrai2.erase(testVrai2.begin(), testVrai2.end());
-	std::cout << test2.size() << " is size after erasing all (test2)\n";
-	std::cout << testVrai2.size() << " is size after erasing all (testVrai2)\n";
+	std::cout << test.size() << " la size avant le erase [test2]" << BN;
+	std::cout << testVrai.size() << " la size avant le erase [testVrai2]" << BN;
+	//ft::map<int, int>::iterator itlast = ++(++(++(++(++(++test.begin())))));
+	// exit(1);
+	test.erase(test.begin(), --(--test.end()));
+	std::cout << test.size() << " is size after erasing all (test2)\n";
+	test.printBT();
+	std::cout << BN << BN;
+	testVrai.erase(testVrai.begin(), --(--testVrai.end()));
+	std::cout << testVrai.size() << " is size after erasing all (testVrai2)\n";
 	return (0);
 }
 

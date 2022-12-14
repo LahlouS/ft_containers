@@ -78,7 +78,6 @@ namespace ft {
 			}
 
 			map&	operator=(const map& x) {
-				std::cout << "je passe ici****************" << BN;
 				if (this->_head != this->_leaf)
 					this->_freeTree(this->_head);
 				_head = _leaf;
@@ -137,11 +136,9 @@ namespace ft {
 
 
 			void		erase(iterator first, iterator last) {
-				int i = 1;
 				while (first != last) {
-					this->_erase(*first);
-					++first;
-					std::cout << i++ << BN;
+					value_type tmp(*first++);
+					this->_erase(tmp);
 				}
 			}
 
@@ -209,7 +206,6 @@ namespace ft {
 			size_type	_erase(const value_type& val) {
 				node*	rm			= _search(this->_head, val);
 				node*	substitute	= NULL;
-
 				if (this->_head == this->_leaf || !this->_size )
 					return (0);
 				if (rm) {
@@ -220,10 +216,11 @@ namespace ft {
 					else
 						legacy->color = BLACK;
 					if (substitute == this->_head)
-						this->_head = this->_leaf;
+						this->_head = legacy;
 					delete substitute;
 					this->_size -= 1;
-					this->_leaf->parent = _findBiggestVal(this->_head);
+					if (this->_head != this->_leaf)
+						this->_leaf->parent = _findBiggestVal(this->_head);
 					return (1);
 				} else
 					return (0);
@@ -265,9 +262,6 @@ namespace ft {
 			node* _find_subsitute(node *root) {
 				if (root->rightChild == _leaf && root->leftChild == _leaf)
 					return (root);
-				else if (root->rightChild && root->leftChild == _leaf) {
-					return (root->rightChild);
-				}
 				else if (root->leftChild && root->rightChild == _leaf) {
 					return (root->leftChild);
 				}
@@ -276,9 +270,12 @@ namespace ft {
 					while (temp->rightChild != _leaf)
 						temp = temp->rightChild;
 					return (temp);
-					// return (_find_subsitute(temp));
 				}
-				return (NULL);
+				// else if (root->rightChild && root->leftChild == _leaf) {
+					// return (root->rightChild);
+				// }
+
+				return (root);
 			}
 
 			void	_checkDansQuelPetrinJeSuis(int& case_flag, node* root, node* rootParent) {
