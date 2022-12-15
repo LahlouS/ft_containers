@@ -28,7 +28,7 @@ namespace ft {
 
 
 	/*  ------------------ MY_MAP --------------------  */
-	template <typename T>
+	template <typename T, typename C>
 	class	binary_tree_iterator;
 
 	template< class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<ft::pair<const Key, T> > >
@@ -37,21 +37,21 @@ namespace ft {
 
 		/*  -------------  Member_types  -----------------------------------*/
 
-			typedef				Key										key_type;
-			typedef				T										mapped_value;
-			typedef	typename	ft::pair<const Key, T>					value_type;
-			typedef				std::size_t								size_type;
-			typedef				std::ptrdiff_t							difference_type;
-			typedef				Compare									key_compare;
-			typedef				Allocator								allocator_type;
-			typedef				value_type&								reference;
-			typedef				const value_type&						const_reference;
-			typedef	typename	Allocator::pointer						pointer;
-			typedef	typename	Allocator::const_pointer				const_pointer;
-			typedef				binary_tree_iterator<value_type>		iterator;
-			typedef				binary_tree_iterator<const value_type>	const_iterator;
-			typedef	typename	ft::reverse_iterator<iterator>			reverse_iterator;
-			typedef	typename	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+			typedef				Key												key_type;
+			typedef				T												mapped_value;
+			typedef	typename	ft::pair<const Key, T>							value_type;
+			typedef				std::size_t										size_type;
+			typedef				std::ptrdiff_t									difference_type;
+			typedef				Compare											key_compare;
+			typedef				Allocator										allocator_type;
+			typedef				value_type&										reference;
+			typedef				const value_type&								const_reference;
+			typedef	typename	Allocator::pointer								pointer;
+			typedef	typename	Allocator::const_pointer						const_pointer;
+			typedef				binary_tree_iterator<value_type, Compare>		iterator;
+			typedef				binary_tree_iterator<const value_type, Compare>	const_iterator;
+			typedef	typename	ft::reverse_iterator<iterator>					reverse_iterator;
+			typedef	typename	ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 
 			typedef struct node {
 				node() : color(BLACK), data(NULL), parent(NULL), rightChild(NULL), leftChild(NULL){	}
@@ -193,8 +193,10 @@ namespace ft {
 				(void)position;
 				if (this->_head != _leaf)
 					ret = this->_dive(_head, val, isbigger, isOk);
-				else
+				else {
 					ret = this->_head = _insertNewElement(NULL, val, BLACK);
+					this->_leaf->parent = this->_head;
+				}
 				if (isOk)
 					this->_size += 1;
 				return (iterator(ret, this->_leaf));
@@ -258,8 +260,10 @@ namespace ft {
 				node* tmp = this->_search(this->_head, k);
 				if (tmp)
 					return (tmp->data->second);
-				else
-					return ( this->insert(this->begin(), ft::make_pair(k, mapped_value()))->second );
+				else {
+					iterator tmp = this->begin();
+					return ( this->insert(tmp, ft::make_pair(k, mapped_value()))->second );
+				}
 			}
 
 			mapped_value& at(const key_type& k){
@@ -389,7 +393,7 @@ namespace ft {
 					return (0);
 			}
 
-			node*	_search(node* root, key_type const & val) {
+			node*	_search(node* root, key_type const & val) const {
 				if (root == this->_leaf)
 					return (NULL);
 				else if (_compAlgo.operator()(root->data->first, val))
@@ -591,21 +595,18 @@ namespace ft {
 									+ ((child == parent->rightChild) * 3) + (parent == gParent->rightChild) * 5;
 						switch (test) {
 							case LLR :
-								// std::cout << "CASE : 1\n\n";
 								_rightRotation(parent, gParent);
 								colorTmp = parent->color;
 								parent->color = gParent->color;
 								gParent->color = colorTmp;
 								break ;
 							case RRR :
-								// std::cout << "CASE : 2 \n\n";
 								_leftRotation(parent, gParent);
 								colorTmp = parent->color;
 								parent->color = gParent->color;
 								gParent->color = colorTmp;
 								break ;
 							case LRR :
-								// std::cout << "CASE : 3\n\n";
 								_rightRotation(child, parent);
 								_leftRotation(child, gParent);
 								colorTmp = child->color;
@@ -613,7 +614,6 @@ namespace ft {
 								gParent->color = colorTmp;
 								break ;
 							case RLR :
-								// std::cout << "CASE : 4\n\n";
 								_leftRotation(child, parent);
 								_rightRotation(child, gParent);
 								colorTmp = child->color;
@@ -658,24 +658,24 @@ namespace ft {
 				return (ret);
 			}
 
-			void printBT(const std::string& prefix, const node* nude, bool isLeft)
-			{
-				if(nude != NULL)
-				{
-					std::cout << prefix;
-
-					std::cout << (isLeft ? "├──" : "└──" );
-
-					// print the value of the node
-					if (nude != this->_leaf)
-						std::cout << "(" << nude->data->first << ")" << (nude->color ? "R" : "B" ) << std::endl;
-					else
-						std::cout << " #" << std::endl;
-					// enter the next tree level - left and right branch
-					printBT( prefix + (isLeft ? "│   " : "    "), nude->rightChild, true);
-					printBT( prefix + (isLeft ? "│   " : "    "), nude->leftChild, false);
-				}
-			}
+			// void printBT(const std::string& prefix, const node* nude, bool isLeft)
+			// {
+				// if(nude != NULL)
+				// {
+					// std::cout << prefix;
+//
+					// std::cout << (isLeft ? "├──" : "└──" );
+//
+		//			print the value of the node
+					// if (nude != this->_leaf)
+						// std::cout << "(" << nude->data->first << ")" << (nude->color ? "R" : "B" ) << std::endl;
+					// else
+						// std::cout << " #" << std::endl;
+		//			enter the next tree level - left and right branch
+					// printBT( prefix + (isLeft ? "│   " : "    "), nude->rightChild, true);
+					// printBT( prefix + (isLeft ? "│   " : "    "), nude->leftChild, false);
+				// }
+			// }
 
 
 		/*  ------------- private functions  ---------------*/
@@ -718,7 +718,7 @@ namespace ft {
 
 		/*  ------------------ MY_ITERATOR ------------------  */
 
-	template <typename T>
+	template <typename T, typename C>
 	class	binary_tree_iterator : public std::iterator<std::bidirectional_iterator_tag, T, std::ptrdiff_t, T*, T&> {
 		public :
 
@@ -726,7 +726,7 @@ namespace ft {
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::difference_type	difference_type;
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::value_type		value_type;
 		typedef typename std::iterator<std::random_access_iterator_tag, T, std::ptrdiff_t, T*, T&>::reference		reference;
-		typedef typename ft::map<typename remove_cv<typename T::first_type>::type, typename T::second_type>::node*	node_type;
+		typedef typename ft::map<typename remove_cv<typename T::first_type>::type, typename T::second_type, C>::node*	node_type;
 
 		/*  -------------------- iterators Constructors ----------------------*/
 
@@ -737,13 +737,13 @@ namespace ft {
 			this->_leaf = leaf;
 		}
 
-		template <typename U>
-		binary_tree_iterator(const binary_tree_iterator<U> & itToCopy) {
+		template <typename U, typename P>
+		binary_tree_iterator(const binary_tree_iterator<U, P> & itToCopy) {
 			*this = itToCopy;
 		}
 
-		template <typename U>
-		binary_tree_iterator const & operator=(binary_tree_iterator<U> const & itToAssign) {
+		template <typename U, typename P>
+		binary_tree_iterator const & operator=(binary_tree_iterator<U, P> const & itToAssign) {
 			this->_location = itToAssign.data();
 			this->_leaf = itToAssign.data2();
 			return (*this);
@@ -751,13 +751,13 @@ namespace ft {
 
 		/*  -----------  == && != -----------  */
 
-		template <typename U>
-		bool		operator==(binary_tree_iterator<U> const & itToComp) {
+		template <typename U, typename P>
+		bool		operator==(binary_tree_iterator<U, P> const & itToComp) {
 			return (_location == itToComp.data());
 		}
 
-		template <typename U>
-		bool		operator!=(binary_tree_iterator<U> const & itToComp) {
+		template <typename U, typename P>
+		bool		operator!=(binary_tree_iterator<U, P> const & itToComp) {
 			return (this->_location != itToComp.data());
 		}
 
@@ -847,6 +847,58 @@ namespace ft {
 		node_type	_location;
 		node_type	_leaf;
 	};
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator==( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ) {
+		typename ft::map<Key,T,Compare,Alloc>::iterator itbeg = lhs.begin();
+		typename ft::map<Key,T,Compare,Alloc>::iterator itend = lhs.end();
+		typename ft::map<Key,T,Compare,Alloc>::iterator itbeg2 = rhs.begin();
+		typename ft::map<Key,T,Compare,Alloc>::iterator itend2 = rhs.end();
+
+		for (; itbeg != itend; itbeg++, itbeg2++)
+		{
+			if (itbeg2 == itend2 || itbeg->first != itbeg2->first || itbeg->second != itbeg2->second)
+				return (false);
+		}
+		return (itbeg == itend && itbeg2 == itend2);
+	}
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator!=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ) {
+		return (!(lhs == rhs));
+	}
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator<( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
+		typename ft::map<Key,T,Compare,Alloc>::iterator itbeg = lhs.begin();
+		typename ft::map<Key,T,Compare,Alloc>::iterator itend = lhs.end();
+		typename ft::map<Key,T,Compare,Alloc>::iterator itbeg2 = rhs.begin();
+
+		if (lhs.size() > rhs.size())
+			return (false);
+		if (lhs.size() < rhs.size())
+			return (true);
+		for (; itbeg != itend; itbeg++, itbeg2++) {
+			if (!(itbeg->second < itbeg2->second))
+				return (false);
+		}
+		return (true);
+	}
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator<=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
+		return (((lhs < rhs) || (lhs == rhs)));
+	}
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator>( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
+		return (!(lhs < rhs) && !(lhs == rhs));
+	}
+
+	template< class Key, class T, class Compare, class Alloc >
+	bool operator>=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
+		return (!(lhs < rhs));
+	}
 }
 
 #endif
