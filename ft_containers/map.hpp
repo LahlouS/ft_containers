@@ -873,16 +873,18 @@ namespace ft {
 		typename ft::map<Key,T,Compare,Alloc>::iterator itbeg = lhs.begin();
 		typename ft::map<Key,T,Compare,Alloc>::iterator itend = lhs.end();
 		typename ft::map<Key,T,Compare,Alloc>::iterator itbeg2 = rhs.begin();
+		typename ft::map<Key,T,Compare,Alloc>::iterator itend2 = rhs.end();
 
-		if (lhs.size() > rhs.size())
-			return (false);
-		if (lhs.size() < rhs.size())
-			return (true);
-		for (; itbeg != itend; itbeg++, itbeg2++) {
-			if (!(itbeg->second < itbeg2->second))
+	//	std::cout << "\n--> " << lhs.size() << " " << rhs.size() << BN;
+		for (; itbeg != itend && itend2 != itbeg2; itbeg++, itbeg2++) {
+			if ((itbeg->second < itbeg2->second))
+				return (true);
+			else
 				return (false);
 		}
-		return (true);
+		if (itbeg2 != itend2)
+			return (true);
+		return (false);
 	}
 
 	template< class Key, class T, class Compare, class Alloc >
@@ -897,7 +899,7 @@ namespace ft {
 
 	template< class Key, class T, class Compare, class Alloc >
 	bool operator>=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
-		return (!(lhs < rhs));
+		return (!(lhs < rhs) || (lhs == rhs));
 	}
 }
 
