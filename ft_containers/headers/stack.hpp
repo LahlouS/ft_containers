@@ -57,7 +57,7 @@ namespace ft {
 			template <class U, class V>
 			friend bool operator>=(const stack<U,V>& lhs, const stack<U,V>& rhs);
 
-		private :
+		protected :
 			Container c;
 	};
 

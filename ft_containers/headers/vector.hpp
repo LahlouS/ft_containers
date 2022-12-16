@@ -397,7 +397,16 @@ namespace ft {
 			}
 
 			void push_back (const value_type& val) {
-				this->insert(this->end(), val);
+				size_type	new_capacity = 0;
+				pointer		dest = NULL;
+
+				if (_capacity != (new_capacity = _return_new_capacity(_size, _capacity, 1)))
+					dest = _allocNewTab(new_capacity);
+				if (dest)
+					_swapTab(dest);
+				_insertVal(val, 1, this->_size);
+				_capacity = new_capacity;
+				++_size;
 			}
 
 			void pop_back(void) {
@@ -548,8 +557,9 @@ namespace ft {
 			}
 
 			void	_insertVal(const value_type& val, size_type n, size_type position){
-				if (this->_size != 0 && (_first_element + position != _first_element + this->_size))
+				if (this->_size != 0 && (_first_element + position != _first_element + this->_size)) {
 					_shiftRight(_first_element + position, position, n);
+				}
 				_putValue(_first_element + position, n, val);
 			}
 
