@@ -491,14 +491,14 @@ namespace ft {
 
 			/*  --------------  print function for debbug  -------------  */
 
-			void	print(void) {
-				std::cout << "_size : " << _size << BN;
-				std::cout << "_capacity : " << _capacity << BN;
-				std::cout << "what is inside my vector : " << BN;
-				for (size_type i = 0; i < _size; i++)
-					std::cout << _first_element[i] << " ";
-				std::cout << BN;
-			}
+			// void	print(void) {
+				// std::cout << "_size : " << _size << BN;
+				// std::cout << "_capacity : " << _capacity << BN;
+				// std::cout << "what is inside my vector : " << BN;
+				// for (size_type i = 0; i < _size; i++)
+					// std::cout << _first_element[i] << " ";
+				// std::cout << BN;
+			// }
 
 		private :
 

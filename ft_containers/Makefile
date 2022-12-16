@@ -6,7 +6,7 @@
 #    By: slahlou <slahlou@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/16 10:23:14 by slahlou           #+#    #+#              #
-#    Updated: 2022/12/16 11:42:10 by slahlou          ###   ########.fr        #
+#    Updated: 2022/12/16 16:40:10 by slahlou          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,8 +15,8 @@ COMPILO	=	c++
 FLAGS	=	-Wall -Wextra -Werror
 INCLUDE	=	-I $(HEADDIR)
 
-SRCDIR	=
-SRC		=	main.cpp
+SRCDIR	=	test/
+SRC		=	main_vector.cpp
 
 OBJDIR	=	obj/
 OBJ		=	$(addprefix $(OBJDIR), $(SRC:.cpp=.o))
@@ -52,7 +52,7 @@ fclean: clean
 	rm -rf $(NAME)
 
 diffclean :
-	rm -rf std_containers
+	rm -rf std_container
 	rm -rf diff real mine
 
 re: clean fclean all

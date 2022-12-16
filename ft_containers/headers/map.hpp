@@ -657,24 +657,22 @@ namespace ft {
 				return (ret);
 			}
 
-			// void printBT(const std::string& prefix, const node* nude, bool isLeft)
-			// {
-				// if(nude != NULL)
-				// {
-					// std::cout << prefix;
-//
-					// std::cout << (isLeft ? "├──" : "└──" );
-//
-		//			print the value of the node
-					// if (nude != this->_leaf)
-						// std::cout << "(" << nude->data->first << ")" << (nude->color ? "R" : "B" ) << std::endl;
-					// else
-						// std::cout << " #" << std::endl;
-		//			enter the next tree level - left and right branch
-					// printBT( prefix + (isLeft ? "│   " : "    "), nude->rightChild, true);
-					// printBT( prefix + (isLeft ? "│   " : "    "), nude->leftChild, false);
-				// }
-			// }
+			void printBT(const std::string& prefix, const node* nude, bool isLeft)
+			{
+				if(nude != NULL)
+				{
+					std::cout << prefix;
+
+					std::cout << (isLeft ? "├──" : "└──" );
+
+					if (nude != this->_leaf)
+						std::cout << "(" << nude->data->first << ")" << (nude->color ? "R" : "B" ) << std::endl;
+					else
+						std::cout << " #" << std::endl;
+					printBT( prefix + (isLeft ? "│   " : "    "), nude->rightChild, true);
+					printBT( prefix + (isLeft ? "│   " : "    "), nude->leftChild, false);
+				}
+			}
 
 
 		/*  ------------- private functions  ---------------*/
