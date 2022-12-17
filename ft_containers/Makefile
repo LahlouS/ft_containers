@@ -6,7 +6,7 @@
 #    By: slahlou <slahlou@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/16 10:23:14 by slahlou           #+#    #+#              #
-#    Updated: 2022/12/17 09:20:27 by slahlou          ###   ########.fr        #
+#    Updated: 2022/12/17 10:09:42 by slahlou          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,8 +15,8 @@ COMPILO	=	c++
 FLAGS	=	-Wall -Wextra -Werror
 INCLUDE	=	-I $(HEADDIR)
 
-SRCDIR	=	#test/
-SRC		=	main.cpp
+SRCDIR	=	test/
+SRC		=	main_map.cpp
 
 OBJDIR	=	obj/
 OBJ		=	$(addprefix $(OBJDIR), $(SRC:.cpp=.o))

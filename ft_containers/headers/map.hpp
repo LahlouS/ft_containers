@@ -44,6 +44,7 @@ namespace ft {
 			typedef				std::ptrdiff_t											difference_type;
 			typedef				Compare													key_compare;
 			typedef				Allocator												allocator_type;
+			typedef	typename	Allocator::template rebind<node>::other					rebind_type;
 			typedef				value_type&												reference;
 			typedef				const value_type&										const_reference;
 			typedef	typename	Allocator::pointer										pointer;
@@ -81,20 +82,24 @@ namespace ft {
 
 			/*  -------------  Constructors  -----------------------------------*/
 			explicit map( const Compare& comp = key_compare(), const Allocator& alloc = Allocator() ) : _mhandle(alloc), _head(NULL), _size(0), _capacity(0), _compAlgo(comp) {
-				_leaf = new node;
+				_leaf = _nodehandle.allocate(1);//new node;
+				_nodehandle.construct(_leaf, node());
 				_head = _leaf;
 				_leaf->leftChild = _leaf->rightChild = NULL;
 			}
 
 			map (const map& x) : _head(NULL), _size(0), _capacity(0) {
-				_leaf = new node;
+				_leaf = _nodehandle.allocate(1);//new node;
+				_nodehandle.construct(_leaf, node());
+				//_leaf = new node;
 				_leaf->leftChild = _leaf->rightChild = NULL;
 				_head = _leaf;
 				*this = x;
 			}
 			template <class InputIterator>
 			map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _mhandle(alloc), _head(NULL), _size(0), _capacity(0), _compAlgo(comp) {
-				_leaf = new node;
+				_leaf = _nodehandle.allocate(1);//new node;
+				_nodehandle.construct(_leaf, node());
 				_head = _leaf;
 				_leaf->leftChild = _leaf->rightChild = NULL;
 				this->insert(first, last);
@@ -112,7 +117,9 @@ namespace ft {
 			~map() {
 				if (this->_head != this->_leaf)
 					this->_freeTree(this->_head);
-				delete _leaf;
+				_nodehandle.destroy(_leaf);
+				_nodehandle.deallocate(_leaf, 1);
+				//delete _leaf;
 			}
 
 			/* ------------------  Iterators stuff  ---------------------- */
@@ -389,7 +396,9 @@ namespace ft {
 						legacy->color = BLACK;
 					if (substitute == this->_head)
 						this->_head = legacy;
-					delete substitute;
+					//delete substitute;
+					_nodehandle.destroy(substitute);
+					_nodehandle.deallocate(substitute, 1);
 					this->_size -= 1;
 					if (this->_head != this->_leaf)
 						this->_leaf->parent = _findBiggestVal(this->_head);
@@ -527,7 +536,8 @@ namespace ft {
 				pointer temp = _mhandle.allocate(1);
 				node*	tempNode;
 				_mhandle.construct(temp, data);
-				tempNode = new node(temp, parent, this->_leaf, this->_leaf, color);
+				tempNode = _nodehandle.allocate(1);
+				_nodehandle.construct(tempNode, node(temp, parent, this->_leaf, this->_leaf, color));
 				return (tempNode);
 			}
 
@@ -686,7 +696,10 @@ namespace ft {
 				_freeTree(current->leftChild);
 				_mhandle.destroy(current->data);
 				_mhandle.deallocate(current->data, 1);
-				delete current;
+				// delete current;
+				_nodehandle.destroy(current);
+				_nodehandle.deallocate(current, 1);
+
 			}
 
 			node*	_getUp(node *from){
@@ -714,6 +727,7 @@ namespace ft {
 			size_type		_size;
 			size_type		_capacity;
 			key_compare		_compAlgo;
+			rebind_type		_nodehandle;
 	};
 
 		/*  ------------------ MY_ITERATOR ------------------  */
