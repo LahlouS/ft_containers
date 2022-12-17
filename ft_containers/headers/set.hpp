@@ -719,6 +719,8 @@ namespace ft {
 		typename ft::set<Key,Compare,Alloc>::const_iterator itend2 = rhs.end();
 
 		for (; itbeg != itend && itend2 != itbeg2; itbeg++, itbeg2++) {
+			if (*itbeg < *itbeg2)
+				return (true);
 		}
 		if (itbeg2 != itend2)
 		{
