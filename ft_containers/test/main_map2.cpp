@@ -46,11 +46,11 @@ int main(void) {
 	std::cout << "size :" << mp.size() << "\n";
 
 
-	try {
-		std::cout << mp.at(0) << " is mapped value at key 12\n";
-	} catch (std::exception & e) {
-		std::cout << e.what() << "\n";
-	}
+	// try {
+		// std::cout << mp.at(0) << " is mapped value at key 12\n";
+	// } catch (std::exception & e) {
+		// std::cout << e.what() << "\n";
+	// }
 
 	std::cout << "\n" << "\n" << "****************** testing the swap function :" << "\n";
 	cpy.insert(ft::make_pair(1000, 0));
@@ -128,17 +128,36 @@ int main(void) {
 	ft::map<int, int> y;
 	ft::map<int, int> z;
 
-	y.insert(ft::make_pair(1, 0));
-	y.insert(ft::make_pair(2, 0));
-	y.insert(ft::make_pair(3, 0));
 
-	z.insert(ft::make_pair(8, 0));
-	z.insert(ft::make_pair(9, 0));
-	z.insert(ft::make_pair(10, 0));
+	std::cout << "************************ testing swap function : **************************** \n\n";
+
+	y.insert(ft::make_pair(1, 56));
+	y.insert(ft::make_pair(2, 57));
+	y.insert(ft::make_pair(3, 58));
+
+	z.insert(ft::make_pair(8, 45));
+	z.insert(ft::make_pair(9, 46));
+	z.insert(ft::make_pair(10, 47));
+
+	std::cout << "keys inserted for z : [8, 9, 10]\n" << z[8] << " " << z[9] << " " << z[10]  << " " << "\n";
+	std::cout << "keys inserted for y : [1, 2, 3] -> " << y[1]  << " " << y[2]  << " " << y[3]  << " " << "\n";
+
+	ft::map<int, int>::iterator rit1 = y.begin();
+	ft::map<int, int>::iterator rit2 = z.begin();
 
 	ft::swap(y, z);
 
+	std::cout << "keys inserted for z : [8, 9, 10] ->" << z[8]  << " " << z[9]  << " " << z[10]  << " " << "\n";
+	std::cout << "keys inserted for y : [1, 2, 3] -> " << y[1]  << " " << y[2]  << " " << y[3]  << " " << "\n";
 
+	std::cout << "\nand testing now with iterators\n\n";
+
+
+	for (; rit1 != z.end(); rit1++)
+		std::cout << "with syntax (*rit).first " << (*rit1).first << "\n";
+	std::cout << "---------------------------------------------\n";
+	for (; rit2 != y.end(); rit2++)
+		std::cout << "with syntax (*rit).first " << (*rit2).first << "\n";
 
 	return (0);
 }
