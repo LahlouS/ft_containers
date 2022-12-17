@@ -6,7 +6,7 @@
 #    By: slahlou <slahlou@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/16 10:23:14 by slahlou           #+#    #+#              #
-#    Updated: 2022/12/17 12:32:26 by slahlou          ###   ########.fr        #
+#    Updated: 2022/12/17 12:50:44 by slahlou          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,6 +45,8 @@ all: $(NAME)
 diff :
 	make re NAME='std_container' REAL='-DREAL=1'
 
+both : re diff
+
 clean:
 	rm -rf $(OBJ)
 
@@ -57,5 +59,6 @@ diffclean :
 
 re: clean fclean all
 
+fullclean : fclean diffclean
 
-.PHONY: re clean fclean diffclean diff
+.PHONY: re clean fclean diffclean diff both fullclean
